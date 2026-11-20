@@ -31,21 +31,20 @@ SOFTWARE.
 <style>
 :root {
   color-scheme: light;
-  --paper: #f7f6ef;
   --ink: #173c3b;
   --line: #cbd8ce;
   --muted-ink: #516a64;
   --radius-lg: 10px;
-  --viz-series-2: #c96b2e;
-  --viz-series-3: #1b826c;
-  --viz-series-5: #745fc7;
-  --muted-foreground: #748987;
+  --viz-series-2: #a64a16;
+  --viz-series-3: #116e56;
+  --viz-series-5: #6850a4;
+  --muted-foreground: #536965;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   color: var(--ink);
-  background: var(--paper);
+  background: transparent;
   font: 16px/1.55 system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 main { width: min(1080px, 100%); margin: 0 auto; padding: 28px clamp(16px, 4vw, 46px) 48px; }
@@ -83,11 +82,10 @@ button { color: var(--ink); }
 .cll-stage-footer, .asl-stage-footer, .cll-legend { color: var(--muted-ink); font-size: 13px; }
 .cll-footnote, .asl-footnote { font-size: 15px; margin: 6px 0; }
 canvas {
-  --background: #10282e; --foreground: #eff7f0; --muted-foreground: #b3c7c1;
-  --border: #73938d; --popover: #203a40; --popover-foreground: #f7faf3;
-  --secondary-foreground: #d5e2dc; --viz-series-1: #6bb9f0;
-  --viz-series-2: #ffc177; --viz-series-3: #7de5bd; --viz-series-4: #e58896;
-  --viz-series-5: #c3a5ef; --viz-series-6: #78d1d7;
+  --foreground: var(--ink);
+  --popover: #f6f8f4;
+  --popover-foreground: var(--ink);
+  --viz-series-1: #307599;
   height: auto;
 }
 @media(max-width: 560px) {
@@ -165,7 +163,6 @@ canvas {
 <style>
   .lens-selector { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:12px; background:#e5ede4; border-radius:12px; }
   .lens-selector b { font-size:13px; letter-spacing:.08em; margin-right:6px; }
-  .cll-stage { overflow:hidden; box-shadow:0 12px 30px #203d3514; }
   #convex-lens-lab {
     display: flex;
     flex-direction: column;
@@ -188,16 +185,14 @@ canvas {
     margin-top: 4px;
     overflow-wrap: anywhere;
   }
-  #convex-lens-lab .cll-stage { padding: 8px; }
+  #convex-lens-lab .cll-stage { padding: 8px; background: transparent; }
   #convex-lens-lab #cll-canvas {
     display: block;
     width: 100%;
     aspect-ratio: 21 / 9;
     border-radius: var(--radius-lg);
-    background: var(--background);
     touch-action: none;
     cursor: grab;
-    color-scheme: dark;
   }
   #convex-lens-lab #cll-canvas:active { cursor: grabbing; }
   #convex-lens-lab .cll-stage-footer {
@@ -295,10 +290,8 @@ canvas {
 
   function palette() {
     return {
-      bg: color('--background'),
       fg: color('--foreground'),
       muted: color('--muted-foreground'),
-      border: color('--border'),
       panel: color('--popover'),
       panelFg: color('--popover-foreground'),
       lens: color('--viz-series-1'),
@@ -306,8 +299,7 @@ canvas {
       image: color('--viz-series-3'),
       rayParallel: color('--viz-series-2'),
       rayCenter: color('--viz-series-3'),
-      rayFocus: color('--viz-series-5'),
-      accent: color('--viz-series-6')
+      rayFocus: color('--viz-series-5')
     };
   }
 
@@ -477,19 +469,6 @@ canvas {
     roundedLabel(label, x, direction < 0 ? tipY - 20 : tipY + 20, p);
   }
 
-  function drawBackground(s, p) {
-    ctx.fillStyle = p.bg;
-    ctx.fillRect(0, 0, s.w, s.h);
-    const glow = ctx.createRadialGradient(s.lensX, s.axisY, 0, s.lensX, s.axisY, s.w * 0.38);
-    const pitch = s.f / 4;
-    for (let x = s.lensX % pitch; x < s.w; x += pitch) line(x, 0, x, s.h, rgba(p.border, .12), .7);
-    for (let y = s.axisY % pitch; y < s.h; y += pitch) line(0, y, s.w, y, rgba(p.border, .12), .7);
-    glow.addColorStop(0, rgba(p.lens, 0.08));
-    glow.addColorStop(1, rgba(p.bg, 0));
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, s.w, s.h);
-  }
-
   function drawAxisAndMarks(s, p) {
     line(18, s.axisY, s.w - 18, s.axisY, rgba(p.muted, 0.7), 1, [5, 6]);
     const marks = [
@@ -651,7 +630,7 @@ canvas {
     const s = scene();
     const p = palette();
     const info = classification(s);
-    drawBackground(s, p);
+    ctx.clearRect(0, 0, s.w, s.h);
     drawAxisAndMarks(s, p);
     drawSpecialRays(s, p);
     drawLens(s, p);
