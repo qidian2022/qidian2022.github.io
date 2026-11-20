@@ -1,0 +1,279 @@
+<!doctype html>
+<!--
+MIT License
+
+Copyright (c) 2026 Yiyan Bai
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<html lang="zh-CN" data-ha-style="teaching">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7f6ef">
+<meta name="description" content="调节电源和两只电阻，对照串、并联电路中各处的电流和电压。">
+<title>串并联电路 · 物理手记</title>
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f7f6ef;
+  --panel: #fffef9;
+  --ink: #173c3b;
+  --muted: #506963;
+  --line: #cbd8ce;
+  --green: #22695b;
+  --copper: #a25327;
+  --stage: #122831;
+  --mint: #9cdec7;
+  --amber: #ffbd86;
+  --mono: ui-monospace, Menlo, Consolas, monospace;
+  --serif: "Songti SC", "Noto Serif CJK SC", "SimSun", serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.55 system-ui, "PingFang SC", "Microsoft YaHei", sans-serif; }
+main { width: min(1100px, 100%); margin: auto; padding: 24px clamp(15px, 4vw, 46px) 46px; }
+.mast { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 12px; font-size: 14px; color: var(--muted); }
+.mast strong { color: var(--ink); }
+.mast a { color: inherit; text-underline-offset: 4px; }
+header { margin: 24px 0 20px; }
+.subject { display: flex; gap: 9px; align-items: center; font-size: 13px; color: var(--green); font-weight: 650; letter-spacing: .1em; }
+.subject::before { content: ""; width: 24px; height: 2px; background: var(--green); }
+h1, h2, p, figure { margin: 0; }
+h1 { margin: 5px 0; font: 700 clamp(32px, 4vw, 46px)/1.3 var(--serif); }
+h2 { font: 700 21px/1.4 var(--serif); }
+header p, .note { color: var(--muted); }
+.lab { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(245px, 1fr); gap: 14px; }
+.object-stage, .controls, .inspector { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.object-stage { display: flex; flex-direction: column; color: #ecf5ed; background: var(--stage); border-color: #314750; }
+.stage-head, .stage-foot, .controls-head, .read-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 14px; }
+.stage-head { padding: 10px 16px; border-bottom: 1px solid #3b5057; }
+.stage-head h2 { font-size: 18px; }
+.mode { display: inline-flex; gap: 3px; }
+button { font: inherit; cursor: pointer; }
+.mode button { min-height: 44px; padding: 6px 14px; border: 1px solid #5e7479; border-radius: 4px; background: transparent; color: #dcece4; font-size: 14px; }
+.mode button[aria-pressed=true] { color: #15362f; border-color: var(--mint); background: var(--mint); font-weight: 700; }
+:focus-visible { outline: 3px solid #bd622f; outline-offset: 3px; }
+.mode :focus-visible { outline-color: var(--amber); }
+.drawing { flex: 1; display: grid; place-items: center; background-color: #152d36; background-image: linear-gradient(90deg, #96c8bc10 1px, transparent 1px), linear-gradient(#96c8bc10 1px, transparent 1px); background-size: 18px 18px; }
+svg { display: block; width: min(100%, 470px); height: auto; }
+.wire, .plate { stroke: #d3dfd9; fill: none; stroke-width: 3; stroke-linejoin: round; }
+.plate.short { stroke-width: 6; }
+.junction { fill: #d3dfd9; }
+.arrow { fill: #d3dfd9; }
+.zero-current .arrow { visibility: hidden; }
+.resistor { stroke: currentColor; stroke-width: 3; fill: #223d44; }
+.r1 { color: var(--mint); }
+.r2 { color: var(--amber); }
+svg text { text-anchor: middle; fill: currentColor; font: 19px var(--mono); }
+.stage-foot { padding: 8px 16px; border-top: 1px solid #3b5057; font-size: 13px; color: #d3e3dd; }
+.stage-foot strong { margin-left: 6px; font: 600 17px var(--mono); color: white; }
+.controls, .inspector { background: var(--panel); }
+.controls { padding: 14px 20px; }
+.controls-head { margin-bottom: 2px; }
+.reset { min-height: 44px; padding: 3px 6px; border: 0; background: transparent; font-size: 14px; color: var(--green); text-decoration: underline; text-underline-offset: 4px; }
+.setting { padding: 10px 0 3px; }
+.setting + .setting { border-top: 1px solid var(--line); }
+.setting label { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 15px; }
+.setting b { font: 600 19px var(--mono); white-space: nowrap; }
+.setting.r-one { --accent: var(--green); }
+.setting.r-two { --accent: var(--copper); }
+.setting input { display: block; width: 100%; height: 44px; margin: 0; accent-color: var(--accent, var(--ink)); cursor: pointer; }
+.inspector { margin-top: 14px; padding: 12px 20px 16px; }
+.compare { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; font-size: 14px; cursor: pointer; }
+.compare input { width: 18px; height: 18px; accent-color: var(--green); margin: 0; }
+table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 15px; }
+th, td { padding: 9px 8px; text-align: right; border-bottom: 1px solid var(--line); }
+th:first-child { text-align: left; width: 34%; }
+thead th { color: var(--muted); font-size: 14px; font-weight: 550; background: #eff3ec; }
+thead th:nth-child(3) { color: var(--green); }
+thead th:nth-child(4) { color: var(--copper); }
+tbody th { font-weight: 500; }
+td { font: 16px var(--mono); font-variant-numeric: tabular-nums; }
+.note { margin-top: 10px; font-size: 13px; }
+.concept-card { margin: 16px 0 0; padding-left: 14px; border-left: 3px solid var(--green); }
+.concept-card strong { display: block; margin-bottom: 3px; }
+[hidden] { display: none !important; }
+@media (max-width: 700px) {
+  main { padding-top: 15px; }
+  header { margin: 17px 0 15px; }
+  .lab { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .controls, .inspector { padding: 10px 13px; }
+  .controls-head { margin: 0; }
+  .setting { padding-top: 6px; }
+  .inspector { margin-top: 10px; }
+  svg { max-width: 405px; }
+}
+@media (max-width: 420px) {
+  .stage-head, .stage-foot { padding-inline: 10px; }
+  .read-head { gap: 0 6px; }
+  .compare { font-size: 13px; }
+  td, th { padding: 8px 4px; font-size: 13px; }
+  th:first-child { width: 36%; }
+  .note { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="mast"><strong>物理手记</strong><span aria-hidden="true">/</span><span id="classroom">课堂实验室</span></div>
+  <header>
+    <div class="subject">初中物理 · 电学</div>
+    <h1>串并联电路</h1>
+    <p>用同一个电源和两只电阻，把串联改成并联。电源提供的电流会怎样变？</p>
+  </header>
+  <div class="lab">
+    <figure class="object-stage" aria-labelledby="figure-heading">
+      <div class="stage-head">
+        <h2 id="figure-heading">电路图</h2>
+        <div class="mode" role="group" aria-label="电阻连接方式">
+          <button type="button" data-mode="series" aria-pressed="true">串联</button>
+          <button type="button" data-mode="parallel" aria-pressed="false">并联</button>
+        </div>
+      </div>
+      <div class="drawing">
+        <svg id="schematic" viewBox="0 0 450 238" role="img" aria-labelledby="diagram-title">
+          <title id="diagram-title">两只电阻串联，箭头表示电流方向</title>
+          <g id="series-path">
+            <path class="wire" d="M215 195H46V85H112 M178 85H269 M335 85H404V195H233"/>
+            <path class="arrow" d="M80 85l-11 -6v12z M232 85l-11 -6v12z"/>
+            <g class="r1"><rect class="resistor" x="112" y="73" width="66" height="24"/><text x="145" y="61">R₁</text><text data-reading="r1" x="145" y="128"></text></g>
+            <g class="r2"><rect class="resistor" x="269" y="73" width="66" height="24"/><text x="302" y="61">R₂</text><text data-reading="r2" x="302" y="128"></text></g>
+          </g>
+          <g id="parallel-path" hidden>
+            <path class="wire" d="M215 195H46V54H194 M256 54H404V195H233 M46 134H194 M256 134H404"/>
+            <circle class="junction" cx="46" cy="134" r="5"/><circle class="junction" cx="404" cy="134" r="5"/>
+            <path class="arrow" d="M126 54l-11 -6v12z M126 134l-11 -6v12z M46 159l-6 11h12z"/>
+            <g class="r1"><rect class="resistor" x="194" y="42" width="62" height="24"/><text x="225" y="31">R₁</text><text data-reading="r1" x="225" y="91"></text></g>
+            <g class="r2"><rect class="resistor" x="194" y="122" width="62" height="24"/><text x="225" y="111">R₂</text><text data-reading="r2" x="225" y="171"></text></g>
+          </g>
+          <path class="plate" d="M215 178v34"/><path class="plate short" d="M233 186v18"/>
+          <text x="196" y="188">+</text><text x="251" y="188">−</text>
+          <text data-reading="source" x="225" y="232"></text>
+        </svg>
+      </div>
+      <figcaption class="stage-foot"><span id="flow-key">箭头表示电流方向</span><span>总电流<strong id="total-current"></strong></span></figcaption>
+    </figure>
+    <section class="controls" aria-labelledby="settings-heading">
+      <div class="controls-head"><h2 id="settings-heading">调节参数</h2><button class="reset" type="button" id="reset">恢复初值</button></div>
+      <div class="setting"><label for="source">电源电压 <b id="source-value"></b></label><input type="range" id="source" min="0" max="12" step="0.5" value="6" aria-label="电源电压"></div>
+      <div class="setting r-one"><label for="r1">电阻 R₁ <b id="r1-value"></b></label><input type="range" id="r1" min="5" max="50" step="1" value="10" aria-label="电阻 R₁"></div>
+      <div class="setting r-two"><label for="r2">电阻 R₂ <b id="r2-value"></b></label><input type="range" id="r2" min="5" max="50" step="1" value="20" aria-label="电阻 R₂"></div>
+    </section>
+  </div>
+  <section class="inspector" aria-labelledby="read-heading">
+    <div class="read-head"><h2 id="read-heading">读数对照</h2><label class="compare"><input type="checkbox" id="compare">同时比较两种接法</label></div>
+    <table aria-labelledby="read-heading">
+      <thead><tr><th scope="col">接法与物理量</th><th scope="col">全电路</th><th scope="col">电阻 R₁</th><th scope="col">电阻 R₂</th></tr></thead>
+      <tbody id="readings"></tbody>
+    </table>
+    <p class="note">采用理想电源，导线电阻取零。读数最多保留三位小数。</p>
+  </section>
+  <p class="concept-card"><strong id="rule"></strong><span id="observation"></span></p>
+</main>
+<script>
+(() => {
+  "use strict";
+  const byId = id => document.getElementById(id);
+  const inputs = ["source", "r1", "r2"].map(byId);
+  const buttons = document.querySelectorAll("[data-mode]");
+  const names = {series: "串联", parallel: "并联"};
+  const format = value => String(Number(value.toFixed(3)));
+  let mode = "series";
+
+  function measure(connection, voltage, r1, r2) {
+    if (connection === "series") {
+      const current = voltage / (r1 + r2);
+      return { currents: [current, current, current], voltages: [voltage, current * r1, current * r2] };
+    }
+    const i1 = voltage / r1;
+    const i2 = voltage / r2;
+    return { currents: [i1 + i2, i1, i2], voltages: [voltage, voltage, voltage] };
+  }
+
+  function addReadings(table, connection, values) {
+    for (const [quantity, readings] of [["电流 / A", values.currents], ["电压 / V", values.voltages]]) {
+      const row = table.insertRow();
+      const label = document.createElement("th");
+      label.scope = "row";
+      label.textContent = names[connection] + quantity;
+      row.append(label);
+      for (const reading of readings) row.insertCell().textContent = format(reading);
+    }
+  }
+
+  function render() {
+    const [voltage, r1, r2] = inputs.map(input => input.valueAsNumber);
+    for (const input of inputs) {
+      const value = input.value + (input.id === "source" ? " V" : " Ω");
+      byId(input.id + "-value").textContent = value;
+      input.setAttribute("aria-valuetext", value);
+      for (const text of document.querySelectorAll('[data-reading="' + input.id + '"]')) text.textContent = value;
+    }
+
+    const series = mode === "series";
+    for (const button of buttons) button.setAttribute("aria-pressed", String(button.dataset.mode === mode));
+    byId("series-path").toggleAttribute("hidden", !series);
+    byId("parallel-path").toggleAttribute("hidden", series);
+    byId("schematic").classList.toggle("zero-current", voltage === 0);
+    byId("flow-key").textContent = voltage === 0 ? "电源电压为零，电流为零" : "箭头表示电流方向";
+    byId("diagram-title").textContent = "两只电阻" + names[mode] + "，" + byId("flow-key").textContent;
+    const measured = measure(mode, voltage, r1, r2);
+    byId("total-current").textContent = format(measured.currents[0]) + " A";
+    const table = byId("readings");
+    table.replaceChildren();
+    addReadings(table, mode, measured);
+    if (byId("compare").checked) {
+      const other = series ? "parallel" : "series";
+      addReadings(table, other, measure(other, voltage, r1, r2));
+    }
+
+    byId("rule").textContent = series
+      ? "串联时，各处电流相等，两只电阻的电压之和等于电源电压。"
+      : "并联时，两只电阻两端的电压相等，干路电流等于两条支路的电流之和。";
+    let observation;
+    if (voltage === 0) observation = "把电源电压调高，观察两只电阻的读数从零开始怎样变化。";
+    else if (r1 === r2) observation = series
+      ? "两只电阻阻值相等，各分得一半电源电压。"
+      : "两条支路阻值相等，各通过一半干路电流。";
+    else if (series) observation = (r1 > r2 ? "R₁" : "R₂") + " 的阻值较大，它两端的电压也较高。";
+    else observation = (r1 < r2 ? "R₁" : "R₂") + " 的阻值较小，通过它的电流较大。";
+    byId("observation").textContent = observation;
+  }
+
+  for (const input of inputs) input.addEventListener("input", render);
+  for (const button of buttons) button.addEventListener("click", () => {
+    mode = button.dataset.mode;
+    render();
+  });
+  byId("compare").addEventListener("change", render);
+  byId("reset").addEventListener("click", () => {
+    for (const input of inputs) input.value = input.defaultValue;
+    render();
+  });
+  if (["http:", "https:"].includes(location.protocol)) {
+    const link = document.createElement("a");
+    link.href = "../index.html#labs";
+    link.textContent = "课堂实验室";
+    byId("classroom").replaceWith(link);
+  }
+  render();
+})();
+</script>
+</body>
+</html>

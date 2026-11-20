@@ -1,0 +1,359 @@
+<!doctype html>
+<!--
+MIT License
+
+Copyright (c) 2026 Yiyan Bai
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<html lang="zh-CN" data-ha-style="teaching">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="改变杠杆两侧的力臂和砝码个数，比较力与力臂的乘积，再松手观察杠杆的转向。">
+<title>杠杆平衡 · 物理手记</title>
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f8f6ef; --card: #fffdf6; --ink: #182c37; --muted: #53615e;
+  --line: #cecfc3; --dark: #142c37; --rust: #a44128; --green: #306853;
+  --peach: #ffb48a; --mint: #abe1c5;
+  --serif: "Songti SC", STSong, "Noto Serif CJK SC", SimSun, Georgia, serif;
+  --mono: ui-monospace, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+main, .mast { width: min(1140px, calc(100% - 48px)); margin: auto; }
+.mast { display: flex; align-items: center; justify-content: space-between; gap: 1em; min-height: 59px; border-bottom: 1px solid var(--line); font-size: .91rem; }
+.brand { font-weight: 700; }
+.slash { margin: 0 .42em; color: #999e90; font-weight: 400; }
+.mast > span:last-child { color: var(--muted); }
+main { padding: 28px 0 36px; }
+header { margin-bottom: 23px; }
+h1, h2, h3, p, figure { margin: 0; }
+h1, h2, h3 { font-family: var(--serif); }
+.subject { color: var(--rust); font-size: .79rem; font-weight: 650; letter-spacing: .12em; }
+.subject::before { content: ""; display: inline-block; width: 24px; height: 2px; margin: 0 10px 4px 0; background: currentColor; }
+h1 { margin: 5px 0 7px; font-size: clamp(2.05rem, 4vw, 3.3rem); line-height: 1.16; }
+header > p:last-child, .note p { color: var(--muted); }
+.workbench { display: grid; grid-template-columns: minmax(0, 1.94fr) minmax(272px, 1fr); gap: 16px; }
+.stage, .controls { min-width: 0; border-radius: 8px; }
+.stage { display: flex; flex-direction: column; overflow: hidden; color: #f8f6e9; background: var(--dark); }
+.stage-head { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; justify-content: space-between; padding: 15px 21px; border-bottom: 1px solid #435960; }
+h2 { font-size: 1.28rem; }
+#result { color: #daf4e7; font-weight: 650; font-size: .94rem; }
+.drawing { flex: 1; display: grid; align-items: center; background-image: radial-gradient(#afc8bd38 .8px, transparent 1px); background-size: 16px 16px; }
+.drawing svg { display: block; width: 100%; height: auto; }
+.hanger { cursor: grab; touch-action: none; }
+.hanger:active { cursor: grabbing; }
+.measurement { font: 600 18px var(--mono); }
+.left-color { color: var(--peach); }
+.right-color { color: var(--mint); }
+.reading { padding: 12px 21px 16px; border-top: 1px solid #425963; background: #112631; }
+.reading h3 { color: #c4d4cf; font-family: inherit; font-size: .81rem; font-weight: 550; }
+.calculation { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin-top: 4px; }
+.calculation > div:last-child { text-align: right; }
+.calculation small { display: block; font-size: .86rem; }
+.calculation strong { font: 650 clamp(1.3rem, 2.6vw, 2rem)/1.35 var(--mono); }
+.calculation strong small { display: inline; font: 500 .8rem var(--mono); }
+#comparison { color: #d3dfd8; font: 1.5rem var(--mono); }
+.controls { padding: 17px 20px 19px; border: 1px solid var(--line); background: var(--card); }
+.controls-head, .name-row, .weight-row, .arm-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid #c5622e; outline-offset: 3px; }
+.reset { min-height: 44px; padding: 0 3px; color: var(--muted); border: 0; background: transparent; font-size: .87rem; }
+.reset:hover { color: var(--rust); }
+.side { padding: 13px 0 8px; border-top: 1px solid var(--line); --accent: var(--rust); }
+.side.right { --accent: var(--green); }
+.name-row { margin-bottom: 6px; }
+.name-row h3 { color: var(--accent); font-size: 1.1rem; }
+.name-row h3::before { content: ""; display: inline-block; width: 12px; height: 5px; margin: 0 8px 3px 0; border-radius: 1px; background: currentColor; }
+.weight-row, .arm-row { font-size: .91rem; }
+.stepper { display: flex; gap: 4px; align-items: center; }
+.stepper button { width: 44px; min-height: 44px; padding: 0; border: 1px solid #c8cabe; border-radius: 5px; background: var(--paper); color: var(--ink); font: 1.25rem var(--mono); }
+.stepper button:disabled { color: #8b938c; background: #f4f3ec; }
+.stepper button:enabled:hover { border-color: var(--accent); }
+output { font-variant-numeric: tabular-nums; font-weight: 650; }
+.stepper output { min-width: 3em; text-align: center; }
+.arm-row { margin-top: 8px; }
+.arm-row output { color: var(--accent); }
+input[type=range] { display: block; width: 100%; height: 44px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.release { width: 100%; min-height: 44px; border: 1px solid var(--ink); border-radius: 5px; background: var(--ink); color: white; font-weight: 650; }
+.release:hover { background: #284b55; }
+.note { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 10px 24px; margin-top: 17px; padding: 15px 0 0; border-top: 1px solid var(--line); font-size: .91rem; }
+.note h2 { font-size: 1.03rem; }
+.note strong { color: var(--ink); }
+@media (max-width: 780px) {
+  .workbench { grid-template-columns: 1fr; gap: 12px; }
+  .sides { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 20px; }
+  .controls { padding: 8px 16px 14px; }
+  .drawing svg { max-height: 280px; }
+}
+@media (max-width: 550px) {
+  main, .mast { width: calc(100% - 28px); }
+  main { padding: 16px 0 24px; }
+  .mast { min-height: 44px; font-size: .8rem; }
+  header { margin-bottom: 14px; }
+  header > p:last-child { font-size: .92rem; }
+  .stage-head { padding: 9px 12px; }
+  h2 { font-size: 1.08rem; }
+  #result { font-size: .84rem; }
+  .measurement, .pivot-label { font-size: 23px; }
+  .reading { padding: 8px 12px 11px; }
+  .calculation small { font-size: .76rem; }
+  .controls { padding: 4px 12px 12px; }
+  .sides { gap: 16px; }
+  .side { padding-top: 8px; }
+  .weight-row { flex-wrap: wrap; gap: 3px; }
+  .stepper { width: 100%; justify-content: space-between; gap: 0; }
+  .stepper output { min-width: auto; font-size: .87rem; }
+  .note { display: block; margin-top: 14px; }
+  .note h2 { margin-bottom: 3px; }
+}
+</style>
+</head>
+<body>
+<div class="mast"><span class="brand">白翊言<span class="slash">/</span>物理手记</span><span>课堂实验室</span></div>
+<main>
+  <header>
+    <p class="subject">初中物理 · 力学</p>
+    <h1>杠杆平衡</h1>
+    <p>左边挂两个砝码，右边只挂一个。右边的砝码挂在哪里，杠杆能保持水平？</p>
+  </header>
+  <div class="workbench">
+    <figure class="stage" aria-labelledby="stage-title">
+      <div class="stage-head"><h2 id="stage-title">杠杆实验台</h2><span id="result" role="status"></span></div>
+      <div class="drawing">
+        <svg id="diagram" viewBox="0 0 640 292" role="img" aria-labelledby="diagram-title diagram-desc">
+          <title id="diagram-title">杠杆、支点与悬挂的砝码</title>
+          <desc id="diagram-desc">杠杆水平时，支点到左右挂孔的水平距离分别是两侧重力的力臂。</desc>
+          <defs>
+            <linearGradient id="brass" x2="0" y2="1" gradientUnits="objectBoundingBox">
+              <stop stop-color="#f1d5a3"/><stop offset=".25" stop-color="#dcc393"/><stop offset=".78" stop-color="#b69667"/><stop offset="1" stop-color="#826c4d"/>
+            </linearGradient>
+            <linearGradient id="metal"><stop stop-color="#526f73"/><stop offset=".45" stop-color="#a2b6ac"/><stop offset="1" stop-color="#527076"/></linearGradient>
+            <linearGradient id="copper"><stop stop-color="#9e5e46"/><stop offset=".2" stop-color="#e49b79"/><stop offset=".4" stop-color="#ffc29b"/><stop offset="1" stop-color="#b37555"/></linearGradient>
+            <linearGradient id="jade"><stop stop-color="#577c6c"/><stop offset=".2" stop-color="#91bba3"/><stop offset=".4" stop-color="#c4e8cb"/><stop offset="1" stop-color="#648d7c"/></linearGradient>
+            <g id="disc">
+              <rect x="-18" y="0" width="36" height="10" rx="2" stroke="#263f42" stroke-width="1"/>
+              <path d="M-14 2.5H12" stroke="#fff4ce" opacity=".55"/>
+              <path d="M9 6h8" stroke="#314a49" stroke-width="1.6"/>
+            </g>
+          </defs>
+          <path d="M22 124H618" stroke="#c0d6c4" stroke-opacity=".48" stroke-dasharray="5 6"/>
+          <path d="M279 246h82l14 8H265Z" fill="#4b686b" stroke="#829994"/>
+          <path d="M294 245l17-118q9-19 18 0l17 118Z" fill="url(#metal)" stroke="#304d55" stroke-width="2"/>
+          <path d="M316 167h8l8 64h-24Z" fill="#213b43"/>
+          <g id="beam">
+            <rect x="39" y="113" width="562" height="23" rx="5" fill="url(#brass)" stroke="#433f35" stroke-width="1.5"/>
+            <path d="M44 115h552" stroke="#fae5bd"/>
+            <g id="marks"></g>
+          </g>
+          <g id="dimensions" fill="none">
+            <g class="left-color" id="left-dimension"><path stroke="currentColor"/><text class="measurement" y="56" fill="currentColor" text-anchor="middle"></text></g>
+            <g class="right-color" id="right-dimension"><path stroke="currentColor"/><text class="measurement" y="56" fill="currentColor" text-anchor="middle"></text></g>
+          </g>
+          <g class="hanger" data-side="left"><rect x="-24" y="-8" width="48" height="90" fill="transparent"/><path d="M-4 -1q0 -7 5 -4q5 3 0 8v20" fill="none" stroke="#ffd1ae" stroke-width="2.6"/><g class="discs" fill="url(#copper)"></g></g>
+          <g class="hanger" data-side="right"><rect x="-24" y="-8" width="48" height="90" fill="transparent"/><path d="M-4 -1q0 -7 5 -4q5 3 0 8v20" fill="none" stroke="#d4edce" stroke-width="2.6"/><g class="discs" fill="url(#jade)"></g></g>
+          <circle cx="320" cy="124" r="12" fill="#426068" stroke="#b9c9b5" stroke-width="2"/>
+          <circle cx="320" cy="124" r="6" fill="url(#brass)"/><path d="M317 127l6-6" stroke="#4a473a" stroke-width="2"/>
+          <text class="pivot-label" x="320" y="279" fill="#cee1d7" font-size="17" text-anchor="middle">支点 O</text>
+        </svg>
+      </div>
+      <figcaption class="reading">
+        <h3>水平时的力 × 力臂</h3>
+        <div class="calculation">
+          <div class="left-color"><small id="left-formula"></small><strong><span id="left-product"></span> <small>N·cm</small></strong></div>
+          <span id="comparison" aria-hidden="true"></span>
+          <div class="right-color"><small id="right-formula"></small><strong><span id="right-product"></span> <small>N·cm</small></strong></div>
+        </div>
+      </figcaption>
+    </figure>
+    <section class="controls" aria-labelledby="controls-title">
+      <div class="controls-head"><h2 id="controls-title">调节杠杆</h2><button class="reset" id="reset" type="button">↺ 复位</button></div>
+      <div class="sides">
+        <section class="side left" aria-labelledby="left-title">
+          <div class="name-row"><h3 id="left-title">左侧</h3></div>
+          <div class="weight-row"><span>砝码</span><div class="stepper">
+            <button type="button" data-side="left" data-step="-1" aria-label="减少左侧砝码">−</button>
+            <output id="left-count" aria-label="左侧砝码个数"></output>
+            <button type="button" data-side="left" data-step="1" aria-label="增加左侧砝码">+</button>
+          </div></div>
+          <div class="arm-row"><label for="left-arm">力臂</label><output id="left-length" for="left-arm"></output></div>
+          <input id="left-arm" type="range" min="5" max="30" step="5" value="10" aria-label="左侧力臂">
+        </section>
+        <section class="side right" aria-labelledby="right-title">
+          <div class="name-row"><h3 id="right-title">右侧</h3></div>
+          <div class="weight-row"><span>砝码</span><div class="stepper">
+            <button type="button" data-side="right" data-step="-1" aria-label="减少右侧砝码">−</button>
+            <output id="right-count" aria-label="右侧砝码个数"></output>
+            <button type="button" data-side="right" data-step="1" aria-label="增加右侧砝码">+</button>
+          </div></div>
+          <div class="arm-row"><label for="right-arm">力臂</label><output id="right-length" for="right-arm"></output></div>
+          <input id="right-arm" type="range" min="5" max="30" step="5" value="10" aria-label="右侧力臂">
+        </section>
+      </div>
+      <button class="release" id="release" type="button">松手观察</button>
+    </section>
+  </div>
+  <aside class="note"><h2>实验手记</h2><div>
+    <p>空杆已在水平位置调平。每个砝码质量为 50 g，取 <i>g</i> = 10 N/kg，每个砝码重 0.5 N。</p>
+    <p>拖动砝码或滑块换挂孔，每格 5 cm。砝码竖直向下拉，力臂是支点到拉力作用线的水平距离。<strong>两侧乘积相等时，杠杆保持水平。</strong></p>
+  </div></aside>
+</main>
+<script>
+(() => {
+  "use strict";
+  const byId = id => document.getElementById(id);
+  const sides = ["left", "right"];
+  const names = { left: "左", right: "右" };
+  const direction = { left: -1, right: 1 };
+  const state = { left: { arm: 10, count: 2 }, right: { arm: 10, count: 1 } };
+  const pivot = { x: 320, y: 124 };
+  const holeSpacing = 44;
+  const diagram = byId("diagram");
+  const hangers = Object.fromEntries(sides.map(side => [side, diagram.querySelector('.hanger[data-side="' + side + '"]')]));
+  const steps = document.querySelectorAll("[data-step]");
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  let released = false;
+  let angle = 0;
+  let frame = 0;
+
+  function svgElement(name, attributes) {
+    const element = document.createElementNS("http://www.w3.org/2000/svg", name);
+    for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, value);
+    return element;
+  }
+  for (let hole = -6; hole <= 6; hole++) {
+    const x = pivot.x + hole * holeSpacing;
+    byId("marks").append(svgElement("path", { d: "M" + x + " 114v5", stroke: "#735c43", "stroke-width": 2 }));
+    byId("marks").append(svgElement("circle", { cx: x, cy: pivot.y, r: 3.4, fill: "#313c39", stroke: "#eed6ad" }));
+  }
+
+  function offset(side) { return direction[side] * state[side].arm / 5 * holeSpacing; }
+  function moment(side) { return state[side].count * 0.5 * state[side].arm; }
+
+  function pose(degrees) {
+    angle = degrees;
+    const rad = degrees * Math.PI / 180;
+    byId("beam").setAttribute("transform", "rotate(" + degrees + " 320 124)");
+    for (const side of sides) {
+      const dx = offset(side);
+      const x = pivot.x + dx * Math.cos(rad);
+      const y = pivot.y + dx * Math.sin(rad);
+      hangers[side].setAttribute("transform", "translate(" + x + " " + y + ")");
+    }
+  }
+
+  function drawSide(side) {
+    const { arm, count } = state[side];
+    const slider = byId(side + "-arm");
+    slider.value = arm;
+    slider.setAttribute("aria-valuetext", arm + " 厘米");
+    byId(side + "-count").textContent = count + " 个";
+    byId(side + "-length").textContent = arm + " cm";
+    byId(side + "-formula").textContent = names[side] + "侧 " + count * 0.5 + " N × " + arm + " cm";
+    byId(side + "-product").textContent = moment(side);
+    const discs = hangers[side].querySelector(".discs");
+    discs.replaceChildren();
+    for (let n = 0; n < count; n++) discs.append(svgElement("use", { href: "#disc", y: 22 + n * 10 }));
+    const x = pivot.x + offset(side);
+    const dimension = byId(side + "-dimension");
+    dimension.querySelector("path").setAttribute("d", "M320 63v12 M320 69H" + x + " M" + x + " 63v12 M" + x + " 80v23");
+    const label = dimension.querySelector("text");
+    label.setAttribute("x", pivot.x + direction[side] * Math.max(33, Math.abs(x - pivot.x) / 2));
+    label.textContent = arm + " cm";
+  }
+
+  function render() {
+    cancelAnimationFrame(frame);
+    for (const side of sides) drawSide(side);
+    for (const button of steps) {
+      const next = state[button.dataset.side].count + Number(button.dataset.step);
+      button.disabled = next < 1 || next > 5;
+    }
+    const sign = Math.sign(moment("right") - moment("left"));
+    const outcome = sign === 0 ? "保持平衡" : (sign < 0 ? "左端" : "右端") + "下降";
+    const phase = !released ? "松手后" : sign === 0 ? "已松手 · " : "转向示意 · ";
+    byId("result").textContent = phase + outcome;
+    byId("comparison").textContent = sign === 0 ? "=" : sign < 0 ? ">" : "<";
+    byId("release").textContent = released ? "扶回水平" : "松手观察";
+    byId("dimensions").style.visibility = released && sign ? "hidden" : "visible";
+    byId("diagram-desc").textContent = "左侧 " + state.left.count + " 个砝码，水平力臂 " + state.left.arm +
+      " 厘米。右侧 " + state.right.count + " 个砝码，水平力臂 " + state.right.arm + " 厘米。松手后" + outcome + "。";
+    // 倾转只展示刚松手时的方向；读数均取水平位置。
+    const target = released ? sign * 9 : 0;
+    if (!released || reducedMotion.matches || target === angle) { pose(target); return; }
+    const start = performance.now();
+    const from = angle;
+    function animate(now) {
+      const t = Math.min(1, (now - start) / 420);
+      pose(from + (target - from) * t * t);
+      if (t < 1) frame = requestAnimationFrame(animate);
+    }
+    frame = requestAnimationFrame(animate);
+  }
+
+  function setArm(side, value) {
+    state[side].arm = value;
+    released = false;
+    render();
+  }
+  for (const side of sides) {
+    byId(side + "-arm").addEventListener("input", event => setArm(side, Number(event.target.value)));
+    const hanger = hangers[side];
+    let drag = null;
+    function modelX(event) {
+      const point = diagram.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      return point.matrixTransform(diagram.getScreenCTM().inverse()).x;
+    }
+    hanger.addEventListener("pointerdown", event => {
+      if (!event.isPrimary || event.button !== 0) return;
+      drag = { id: event.pointerId, start: modelX(event), arm: state[side].arm };
+      hanger.setPointerCapture(event.pointerId);
+    });
+    hanger.addEventListener("pointermove", event => {
+      if (!drag || drag.id !== event.pointerId) return;
+      const holes = Math.round(drag.arm / 5 + direction[side] * (modelX(event) - drag.start) / holeSpacing);
+      const arm = 5 * Math.min(6, Math.max(1, holes));
+      if (arm !== state[side].arm) setArm(side, arm);
+    });
+    hanger.addEventListener("lostpointercapture", () => { drag = null; });
+  }
+  for (const button of steps) button.addEventListener("click", () => {
+    state[button.dataset.side].count += Number(button.dataset.step);
+    released = false;
+    render();
+  });
+  byId("release").addEventListener("click", () => { released = !released; render(); });
+  byId("reset").addEventListener("click", () => {
+    state.left.count = 2;
+    state.right.count = 1;
+    for (const side of sides) state[side].arm = 10;
+    released = false;
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

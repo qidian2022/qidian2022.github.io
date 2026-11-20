@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f6ef">
-  <meta name="description" content="白翊言的物理手记。动手试试凸透镜、日月食和潜水蛙，读一读我的教学经历与 GitHub 项目。">
+  <meta name="description" content="白翊言的物理手记。动手做物理实验，看看我的教学经历、个人项目和户外相册。">
   <meta property="og:title" content="白翊言的物理手记">
-  <meta property="og:description" content="一位物理老师的互动实验、教学经历与开源项目。">
+  <meta property="og:description" content="一位物理老师的互动实验、教学经历与个人项目。">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://qidian2022.github.io/assets/share.jpg">
   <meta property="og:url" content="https://qidian2022.github.io/">
@@ -21,7 +21,7 @@
   <header class="masthead">
     <div class="wrap mast-inner">
       <a class="brand" href="#top" aria-label="白翊言的物理手记，首页"><img src="assets/orbit.png" alt="" width="38" height="38"><span>白翊言<span class="brand-cut"> / </span><span class="brand-sub">物理手记</span></span></a>
-      <nav aria-label="主导航"><a href="#labs">课堂实验</a><a href="#about">关于我</a><a href="#projects">个人项目</a></nav>
+      <nav aria-label="主导航"><a href="#labs">课堂实验</a><a href="#about">关于我</a><a href="#projects">个人项目</a><a href="#outdoors">户外相册</a></nav>
       <a class="github-link" href="https://github.com/qidian2022"><span aria-hidden="true" class="brackets">{ }</span> GitHub</a>
     </div>
   </header>
@@ -31,7 +31,7 @@
         <div class="intro">
           <p class="eyebrow"><span class="rule"></span><span lang="en">PHYSICS EDUCATOR</span></p>
           <h1 id="hello"><span>你好，我是</span><strong>白翊言<span class="period">。</span></strong></h1>
-          <p class="lede">我教物理，也写代码。把透镜挪近一点，像会跑到哪里？我把零基础课堂上的这类问题做成了网页实验，你也可以动手试试。</p>
+          <p class="lede">我教物理，也写代码。潜水越深，压强越大；换一种液体，同一深度的读数还一样吗？在课堂实验室里，你可以动手找答案。</p>
           <div class="hero-actions"><a class="button primary" href="#labs"><span aria-hidden="true" class="play-glyph"></span>进入课堂实验室</a><a class="text-link" href="#about">了解我的经历</a></div>
         </div>
         <div class="portrait-board">
@@ -46,27 +46,43 @@
       <div class="wrap">
         <div class="section-heading"><div><p class="eyebrow"><span class="rule"></span><span lang="en">THE CLASSROOM</span></p><h2 id="lab-title">课堂实验室</h2></div><p>选一个你想弄明白的问题。<br>每个实验都能在浏览器里操作，也能单独下载。</p></div>
         <div class="lab-grid">
-          <article class="lab-card"><a class="lab-entry" href="labs/convex-lens.html"><div class="plate"><img src="assets/lens.webp" width="800" height="400" alt="凸透镜两侧的物体、折射光线与倒立像" decoding="async"></div><div class="lab-info"><p class="topic">光学 <span lang="en">/ OPTICS</span></p><h3>凸透镜成像</h3><p class="summary">把物体推向焦点，看看倒立的实像在哪里消失，正立的虚像又在哪里出现。</p></div></a><div class="lab-links"><a href="labs/convex-lens.html" aria-label="打开凸透镜成像实验"><span class="play-glyph" aria-hidden="true"></span>打开实验</a><a href="labs/convex-lens.html" download aria-label="下载凸透镜成像 HTML">下载 HTML</a></div></article>
+          <article class="lab-card"><a class="lab-entry" href="labs/buoyancy.html"><div class="plate"><img src="assets/buoyancy.png" width="800" height="400" loading="lazy" alt="方块漂浮在水槽中，括线标出浸在水面下的部分"></div><div class="lab-info"><p class="topic">浮力 / BUOYANCY</p><h3>阿基米德浮沉实验</h3><p class="summary">改变物体和液体的密度，比较漂浮、悬浮和沉底时的排水体积。</p></div></a><div class="lab-links"><a href="labs/buoyancy.html" aria-label="打开阿基米德浮沉实验">打开实验</a><a href="labs/buoyancy.html" download aria-label="下载阿基米德浮沉实验 HTML">下载 HTML</a></div></article>
+          <article class="lab-card"><a class="lab-entry" href="labs/convex-lens.html"><div class="plate"><img src="assets/convex-lens.png" width="800" height="400" loading="lazy" alt="光线经凹透镜发散，反向延长线交于物体同侧的虚像"></div><div class="lab-info"><p class="topic">光学 / OPTICS</p><h3>透镜成像</h3><p class="summary">物体不动，只换一片透镜。比较凸透镜与凹透镜的光路，看看像落在哪里。</p></div></a><div class="lab-links"><a href="labs/convex-lens.html" aria-label="打开透镜成像">打开实验</a><a href="labs/convex-lens.html" download aria-label="下载透镜成像 HTML">下载 HTML</a></div></article>
           <article class="lab-card"><a class="lab-entry" href="labs/celestial-shadows.html"><div class="plate"><img src="assets/eclipse.webp" width="800" height="400" alt="太阳被天体遮挡时留下的一圈日光" decoding="async"></div><div class="lab-info"><p class="topic">天文 <span lang="en">/ ASTRONOMY</span></p><h3>日月食与水星凌日</h3><p class="summary">切换日食、月食和水星凌日，把天体的位置和观测者眼中的画面对起来。</p></div></a><div class="lab-links"><a href="labs/celestial-shadows.html" aria-label="打开日月食与水星凌日实验"><span class="play-glyph" aria-hidden="true"></span>打开实验</a><a href="labs/celestial-shadows.html" download aria-label="下载日月食与水星凌日 HTML">下载 HTML</a></div></article>
           <article class="lab-card"><a class="lab-entry" href="labs/diving-frog.html"><div class="plate"><img src="assets/frog.webp" width="800" height="400" alt="潜水蛙游在带有深度标尺的水下" decoding="async"></div><div class="lab-info"><p class="topic">流体 <span lang="en">/ FLUIDS</span></p><h3>潜水蛙的压强实验</h3><p class="summary">带小蛙潜到水下。换一种液体，保持深度相同，压强计上的数字会怎样变？</p></div></a><div class="lab-links"><a href="labs/diving-frog.html" aria-label="打开潜水蛙的压强实验"><span class="play-glyph" aria-hidden="true"></span>打开实验</a><a href="labs/diving-frog.html" download aria-label="下载潜水蛙的压强实验 HTML">下载 HTML</a></div></article>
+          <article class="lab-card"><a class="lab-entry" href="labs/lever.html"><div class="plate"><img src="assets/lever.png" width="800" height="400" loading="lazy" alt="杠杆平衡实验示意图"></div><div class="lab-info"><p class="topic">力学 / MECHANICS</p><h3>杠杆平衡</h3><p class="summary">移动挂点或增减砝码，先猜哪端会下降，再松手检验。</p></div></a><div class="lab-links"><a href="labs/lever.html" aria-label="打开杠杆平衡">打开实验</a><a href="labs/lever.html" download aria-label="下载杠杆平衡 HTML">下载 HTML</a></div></article>
+          <article class="lab-card"><a class="lab-entry" href="labs/circuits.html"><div class="plate"><img src="assets/circuits.png" width="800" height="400" loading="lazy" alt="串并联电路实验示意图"></div><div class="lab-info"><p class="topic">电学 / CIRCUITS</p><h3>串并联电路</h3><p class="summary">用同一组电阻和电源，对照两种接法下的分压和分流。</p></div></a><div class="lab-links"><a href="labs/circuits.html" aria-label="打开串并联电路">打开实验</a><a href="labs/circuits.html" download aria-label="下载串并联电路 HTML">下载 HTML</a></div></article>
         </div>
         <div class="bench-row"><div class="bench-copy"><p class="eyebrow"><span class="rule"></span><span lang="en">AT THE LAB BENCH</span></p><h3>一根线，也能计时。</h3><p>摆长变成原来的四倍，一次往返要花几倍的时间？先猜一猜，再把摆长从 0.30 米调到 1.20 米。</p></div><pendulum-bench><p>小角度摆动时，摆长变成四倍，周期变成两倍。</p></pendulum-bench></div>
       </div>
     </section>
-    <section class="about" id="about" aria-labelledby="about-title"><div class="wrap about-grid"><div class="about-intro"><p class="eyebrow"><span class="rule"></span><span lang="en">ABOUT ME</span></p><h2 id="about-title">走上讲台的路</h2><p>高中时我参加物理竞赛，后来回到母校带暑期集训。在上海交大学数学的几年里，我也研究过怎样让机器人学会走路。现在，我在讲台上和学生一起琢磨物理问题。</p></div>
+    <section class="about" id="about" aria-labelledby="about-title"><div class="wrap about-grid"><div class="about-intro"><p class="eyebrow"><span class="rule"></span><span lang="en">ABOUT ME</span></p><h2 id="about-title">走上讲台的路</h2><p>高中时我参加物理和数学竞赛，后来回到母校带暑期集训。在上海交大学读书的几年里，我也研究过怎样让机器人学会走路。现在，我在讲台上和学生一起琢磨物理问题。</p></div>
       <ol class="timeline">
-        <li><p class="when">2026.07 — 至今</p><h3>物理教师</h3><p>在教培机构任教，为零基础物理课制作互动演示，把光路、影子和液体压强带进课堂。</p></li>
-        <li><p class="when">2022.09 — 2026.06</p><h3>上海交通大学 · 数学与应用数学</h3><p>在校期间研究不对称拍卖均衡。2024 年夏，在北卡罗来纳州立大学研究人形机器人的强化学习运动控制。</p></li>
-        <li><p class="when">2025.07 — 2026.01</p><h3>渤海证券、瑞银 · 量化实习</h3><p>在渤海证券用股票数据检验因子模型，随后在瑞银把持仓分析和交易核对做成可交互的工具。</p></li>
+        <li><p class="when">2026.07 — 至今</p><h3>上海家辉教育 · 超优物理教师</h3><p>我上物理课，也把液体压强、单摆等课堂实验做成网页，让学生自己动手调参数、读数据。</p></li>
+        <li><p class="when">2025.07 — 2026.01</p><h3>两段量化金融实习</h3><p>在渤海证券用股票数据检验因子模型，随后在瑞士银行（UBS）把持仓分析和交易核对做成可交互的工具。</p></li>
+        <li><p class="when">2022.09 — 2026.06</p><h3>上海交通大学 · 数学与应用数学</h3><p>2024 年夏，受邀赴美访学，在北卡罗来纳州立大学研究人形机器人的强化学习运动控制。</p></li>
         <li><p class="when">2022、2023 年暑期</p><h3>天津市第一中学 · 物理竞赛教练</h3><p>回母校参加暑期集训教学，给学弟学妹串讲知识点、讲题和答疑。</p></li>
-        <li><p class="when">2020、2021</p><h3>中国物理奥赛 · 省级一等奖</h3></li>
+        <li><p class="when">2021</p><h3>中国科协「英才计划」学员</h3></li>
+        <li><p class="when">2020、2021</p><h3>物理与数学竞赛</h3><p>连续两年获中国物理奥赛省级一等奖、中国数学奥赛省级二等奖。</p></li>
       </ol></div></section>
     <section class="projects" id="projects" aria-labelledby="projects-title"><div class="wrap">
-      <div class="section-heading"><div><p class="eyebrow"><span class="rule"></span><span lang="en">ON GITHUB</span></p><h2 id="projects-title">课堂之外的代码</h2></div><a class="text-link" href="https://github.com/qidian2022?tab=repositories">我的所有仓库</a></div>
+      <div class="section-heading"><div><p class="eyebrow"><span class="rule"></span><span lang="en">PERSONAL PROJECTS</span></p><h2 id="projects-title">个人项目</h2></div><a class="text-link" href="https://github.com/qidian2022?tab=repositories">我的所有仓库</a></div>
       <div class="repo-list">
-        <article class="repo"><div class="repo-icon translate" aria-hidden="true">A<span>译</span></div><div class="repo-title"><h3><a href="https://github.com/qidian2022/chrome-selection-translator">划词译</a></h3><p>Chrome 扩展</p></div><p class="repo-desc">读外文时，选中原句就能看中文译文、查生词，还可以围绕这句话继续提问。</p><a class="repo-link" href="https://github.com/qidian2022/chrome-selection-translator" aria-label="查看划词译 GitHub 仓库">查看仓库</a></article>
         <article class="repo"><div class="repo-icon drive" aria-hidden="true"><i></i></div><div class="repo-title"><h3><a href="https://github.com/qidian2022/kemuyi-practice">稳稳过 · 科目一</a></h3><p>网页练习工具</p></div><p class="repo-desc">在手机或电脑上练习科目一，做完题对照解析，把容易混淆的题目收藏起来重练。<a class="try-link" href="https://qidian2022.github.io/kemuyi-practice/">在线试用</a></p><a class="repo-link" href="https://github.com/qidian2022/kemuyi-practice" aria-label="查看稳稳过 GitHub 仓库">查看仓库</a></article>
-        <article class="repo"><div class="repo-icon layers" aria-hidden="true"><i></i></div><div class="repo-title"><h3><a href="https://github.com/qidian2022/Compositor-ZH">Compositor 中文版</a></h3><p>macOS 图像编辑器</p></div><p class="repo-desc">为开源图像编辑器 Compositor 维护的简体中文分支，可以用中文界面编辑图层、蒙版和 RAW 照片。</p><a class="repo-link" href="https://github.com/qidian2022/Compositor-ZH" aria-label="查看 Compositor 中文版 GitHub 仓库">查看仓库</a></article>
+        <article class="repo"><div class="repo-icon grade" aria-hidden="true">A+</div><div class="repo-title"><h3>作业批阅网站</h3><p>教学网站 · 暂未开源</p></div><p class="repo-desc">导入 ClassIn 作业照片或 PDF，网站用图像识别技术读取手写答案，逐题自动批阅。教师可以对照原图复核疑题，再按班导出成绩和评语。</p><p class="contact">商务合作<br><a href="mailto:baiyiyan@jhcorp.cn">baiyiyan@jhcorp.cn</a></p></article>
+        <article class="repo"><div class="repo-icon translate" aria-hidden="true">A<span>译</span></div><div class="repo-title"><h3><a href="https://github.com/qidian2022/chrome-selection-translator">划词译</a></h3><p>Chrome 扩展</p></div><p class="repo-desc">读外文时，选中原句就能看中文译文、查生词，还可以围绕这句话继续提问。</p><a class="repo-link" href="https://github.com/qidian2022/chrome-selection-translator" aria-label="查看划词译 GitHub 仓库">查看仓库</a></article>
+        <article class="repo"><div class="repo-icon layers" aria-hidden="true"><i></i></div><div class="repo-title"><h3><a href="https://github.com/qidian2022/Compositor-ZH">Compositor 中文版</a></h3><p>macOS 图像编辑器</p></div><p class="repo-desc">为 Compositor 维护的简体中文分支，采用轻量化安装，实现了 Photoshop 90% 以上的功能，支持图层、蒙版和 RAW 照片编辑。</p><a class="repo-link" href="https://github.com/qidian2022/Compositor-ZH" aria-label="查看 Compositor 中文版 GitHub 仓库">查看仓库</a></article>
+      </div></div></section>
+    <section class="outdoors" id="outdoors" aria-labelledby="outdoor-title"><div class="wrap">
+      <div class="section-heading"><div><p class="eyebrow"><span class="rule"></span><span lang="en">FIELD NOTES</span></p><h2 id="outdoor-title">课余，在山里</h2></div></div>
+      <p>我喜欢越野跑、攀冰、滑雪和徒步。这是我在山里留下的几张照片。</p>
+      <div class="photo-grid">
+        <figure><img src="assets/ice.jpg" alt="攀登者系着保护绳，用冰镐攀上蓝色冰壁" loading="lazy"><figcaption>攀冰 · 2026.1 · 北京 云蒙峡</figcaption></figure>
+        <figure><img src="assets/ski.jpg" alt="穿蓝色外套的滑雪者在雪坡上转弯" loading="lazy"><figcaption>滑雪 · 2025.2 · 吉林 北大湖</figcaption></figure>
+        <figure><img src="assets/glacier.jpg" alt="背着行囊的队伍沿雪地向山峰前行" loading="lazy"><figcaption>徒步 · 2025.7 · 新疆 南天山北线</figcaption></figure>
+        <figure><img src="assets/valley.jpg" alt="徒步者沿山谷小路走向云雾中的群山" loading="lazy"><figcaption>徒步 · 2026.5 · 四川 贡嘎大环线</figcaption></figure>
+        <figure class="trail-photo"><img src="assets/trail-tsaigu.jpg" alt="越野跑选手手持折叠跑杖，跑过灯光照亮的赛道" loading="lazy"><figcaption>越野跑 · 2025.11 · 浙江 <span class="race-name">柴古唐斯50km组</span></figcaption></figure>
+        <figure class="trail-photo"><img src="assets/trail-wenling.jpg" alt="越野跑选手戴着墨镜，身穿补给背心和号码布奔跑" loading="lazy"><figcaption>越野跑 · 2025.3 · 浙江 <span class="race-name">黄金海岸25km组</span></figcaption></figure>
       </div></div></section>
   </main>
   <footer><div class="wrap foot-inner"><span>白翊言 <i lang="en">Yiyan Bai</i></span><div><a href="https://github.com/qidian2022/qidian2022.github.io">本站源码</a><a href="#top">回到页首</a></div></div></footer>

@@ -26,8 +26,8 @@ SOFTWARE.
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="把物体从两倍焦距外移到焦点以内，看看它的像去了哪里。">
-<title>凸透镜成像 · 课堂演示</title>
+<meta name="description" content="切换凸透镜和凹透镜，拖动物体，对照折射光路、像的位置和放大率。">
+<title>透镜成像 · 课堂演示</title>
 <style>
 :root {
   color-scheme: light;
@@ -104,8 +104,9 @@ canvas {
 </head>
 <body><main>
 <nav class="lab-nav" aria-label="返回主页"><a href="../index.html#labs"><span aria-hidden="true">←</span> 课堂演示</a></nav>
-<header><small>GEOMETRICAL OPTICS</small><h1>凸透镜成像</h1><p>把物体从两倍焦距外移到焦点以内，看看它的像去了哪里。</p></header>
+<header><small>光学实验台　/　GEOMETRICAL OPTICS</small><h1>透镜成像</h1><p>先固定物体的位置，换一片透镜。观察折射光线，看它们在哪里相交，或从哪里发散。</p></header>
 <div id="convex-lens-lab">
+  <div class="lens-selector" role="group" aria-label="透镜类型"><b>选择镜片</b><button class="btn btn-primary" data-lens="1" aria-pressed="true">凸透镜 · 会聚</button><button class="btn" data-lens="-1" aria-pressed="false">凹透镜 · 发散</button></div>
   <div class="cll-zonebar" role="group" aria-label="物距区域快速定位">
     <button type="button" class="btn btn-primary cll-zone" data-ratio="2.65" aria-pressed="true">二倍焦距外</button>
     <button type="button" class="btn cll-zone" data-ratio="2" aria-pressed="false">二倍焦距处</button>
@@ -131,7 +132,7 @@ canvas {
   </div>
 
   <div class="card cll-stage">
-    <canvas id="cll-canvas" role="img" aria-label="可拖动物体和凸透镜的凸透镜成像与特殊光线演示"></canvas>
+    <canvas id="cll-canvas" role="img" aria-label="可拖动物体与透镜的成像光路图"></canvas>
     <div class="cll-stage-footer">
       <span><span aria-hidden="true">↕</span> 拖动物体可上下、前后移动</span>
       <span><span aria-hidden="true">↔</span> 拖动透镜可左右移动</span>
@@ -152,16 +153,19 @@ canvas {
   </div>
 
   <div class="viz-row cll-legend" aria-label="特殊光线图例">
-    <span><i class="cll-swatch cll-ray-parallel" aria-hidden="true"></i>平行主光轴 → 通过像方焦点</span>
+    <span><i class="cll-swatch cll-ray-parallel" aria-hidden="true"></i><span id="parallel-key"></span></span>
     <span><i class="cll-swatch cll-ray-center" aria-hidden="true"></i>通过光心 → 方向不变</span>
-    <span><i class="cll-swatch cll-ray-focus" aria-hidden="true"></i>通过物方焦点 → 平行主光轴</span>
-    <span><i class="cll-dash" aria-hidden="true"></i>反向延长线</span>
+    <span><i class="cll-swatch cll-ray-focus" aria-hidden="true"></i><span id="focus-key"></span></span>
+    <span><i class="cll-dash" aria-hidden="true"></i>光线延长线</span>
   </div>
 
   <p class="text-small text-muted cll-footnote" id="cll-footnote">物体位于二倍焦距以外时，像成在另一侧的一倍与二倍焦距之间。</p>
 </div>
 
 <style>
+  .lens-selector { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:12px; background:#e5ede4; border-radius:12px; }
+  .lens-selector b { font-size:13px; letter-spacing:.08em; margin-right:6px; }
+  .cll-stage { overflow:hidden; box-shadow:0 12px 30px #203d3514; }
   #convex-lens-lab {
     display: flex;
     flex-direction: column;
@@ -250,15 +254,20 @@ canvas {
     thirdRay: root.querySelector('#cll-third-ray')
   };
 
+  const focusRatio = 0.105;
+  const initialLensX = 0.58;
+  const initialObjectX = initialLensX - 2.65 * focusRatio;
   const state = {
-    lensX: 0.58,
-    objectX: 0.301,
+    sign: 1,
+    lensX: initialLensX,
+    objectX: initialObjectX,
     objectBaseY: 0.56,
     dragging: null,
     pointerId: null,
+    grabOffsetX: 0,
+    grabOffsetY: 0,
     view: { width: 0, height: 0, dpr: 1 }
   };
-  const focusRatio = 0.105;
   const colorCache = new Map();
   const alphaCache = new Map();
 
@@ -325,19 +334,20 @@ canvas {
     const lensX = state.lensX * w;
     const objectX = state.objectX * w;
     const objectBaseY = state.objectBaseY * h;
-    const objectTipY = objectBaseY - h * 0.17;
+    const objectTipY = objectBaseY - h * 0.13;
     const u = lensX - objectX;
     const ratio = u / f;
-    const atFocus = Math.abs(ratio - 1) < 1e-8;
+    const signedF = state.sign * f;
+    const atFocus = state.sign === 1 && Math.abs(ratio - 1) < 1e-8;
     let v = Infinity;
     let magnification = Infinity;
     if (!atFocus) {
-      v = f * u / (u - f);
+      v = signedF * u / (u - signedF);
       magnification = -v / u;
     }
     return {
       w, h, axisY, f, lensX, objectX, objectBaseY, objectTipY, u, ratio,
-      atFocus, v, magnification,
+      atFocus, signedF, v, magnification, lensTop: axisY - h * 0.4, lensBottom: axisY + h * 0.4,
       imageX: atFocus ? Infinity : lensX + v,
       imageBaseY: atFocus ? Infinity : axisY + magnification * (objectBaseY - axisY),
       imageTipY: atFocus ? Infinity : axisY + magnification * (objectTipY - axisY)
@@ -346,6 +356,13 @@ canvas {
 
   function classification(s) {
     const r = s.ratio;
+    if (state.sign < 0) {
+      return {
+        key: 'diverging', region: `物距为焦距绝对值的 ${r.toFixed(2)} 倍`, position: '物体同侧，光心与焦点之间',
+        result: '正立 · 缩小 · 虚像', badge: '正立 · 缩小 · 虚像',
+        foot: '平行入射的光线经凹透镜折射后向外偏折。沿它反向延长，与通过光心的光线相交，就找到了虚像的顶端。'
+      };
+    }
     if (s.atFocus) {
       return {
         key: 'focus', region: '物体位于焦点处', position: '像在无穷远处', result: '不成清晰像', badge: '折射光线平行',
@@ -431,6 +448,8 @@ canvas {
   function drawArrowObject(x, baseY, tipY, colorValue, label, p, virtual = false) {
     const direction = tipY < baseY ? -1 : 1;
     const length = Math.abs(baseY - tipY);
+    const head = Math.min(12, Math.max(3, length * 0.45));
+    const foot = Math.min(15, Math.max(4, length * 0.45));
     ctx.save();
     ctx.strokeStyle = colorValue;
     ctx.fillStyle = colorValue;
@@ -443,8 +462,8 @@ canvas {
     ctx.setLineDash([]);
     ctx.beginPath();
     ctx.moveTo(x, tipY);
-    ctx.lineTo(x - 9, tipY - direction * 12);
-    ctx.lineTo(x + 9, tipY - direction * 12);
+    ctx.lineTo(x - 0.75 * head, tipY - direction * head);
+    ctx.lineTo(x + 0.75 * head, tipY - direction * head);
     ctx.closePath();
     if (virtual) {
       ctx.globalAlpha = 0.58;
@@ -453,7 +472,7 @@ canvas {
       ctx.fill();
     }
     ctx.globalAlpha = virtual ? 0.58 : 1;
-    ctx.fillRect(x - 15, baseY - 2, 30, 4);
+    ctx.fillRect(x - foot, baseY - 1.5, 2 * foot, 3);
     ctx.restore();
     roundedLabel(label, x, direction < 0 ? tipY - 20 : tipY + 20, p);
   }
@@ -462,6 +481,9 @@ canvas {
     ctx.fillStyle = p.bg;
     ctx.fillRect(0, 0, s.w, s.h);
     const glow = ctx.createRadialGradient(s.lensX, s.axisY, 0, s.lensX, s.axisY, s.w * 0.38);
+    const pitch = s.f / 4;
+    for (let x = s.lensX % pitch; x < s.w; x += pitch) line(x, 0, x, s.h, rgba(p.border, .12), .7);
+    for (let y = s.axisY % pitch; y < s.h; y += pitch) line(0, y, s.w, y, rgba(p.border, .12), .7);
     glow.addColorStop(0, rgba(p.lens, 0.08));
     glow.addColorStop(1, rgba(p.bg, 0));
     ctx.fillStyle = glow;
@@ -471,11 +493,11 @@ canvas {
   function drawAxisAndMarks(s, p) {
     line(18, s.axisY, s.w - 18, s.axisY, rgba(p.muted, 0.7), 1, [5, 6]);
     const marks = [
-      { x: s.lensX - 2 * s.f, label: '2F', strong: false },
-      { x: s.lensX - s.f, label: 'F', strong: true },
+      { x: s.lensX - 2 * s.signedF, label: '2F', strong: false },
+      { x: s.lensX - s.signedF, label: 'F', strong: true },
       { x: s.lensX, label: 'O', strong: true },
-      { x: s.lensX + s.f, label: 'F′', strong: true },
-      { x: s.lensX + 2 * s.f, label: '2F′', strong: false }
+      { x: s.lensX + s.signedF, label: 'F′', strong: true },
+      { x: s.lensX + 2 * s.signedF, label: '2F′', strong: false }
     ];
     marks.forEach(mark => {
       if (mark.x < 12 || mark.x > s.w - 12) return;
@@ -502,14 +524,14 @@ canvas {
       line(s.lensX + s.f, dimY - 5, s.lensX + s.f, dimY + 5, rgba(p.lens, 0.72), 1.2);
       ctx.fillStyle = p.fg;
       ctx.textAlign = 'center';
-      ctx.fillText('焦距 f', s.lensX + s.f / 2, dimY - 7);
+      ctx.fillText('|f|', s.lensX + s.f / 2, dimY - 7);
       ctx.restore();
     }
   }
 
   function drawLens(s, p) {
-    const top = s.h * 0.17;
-    const bottom = s.h * 0.87;
+    const top = s.lensTop;
+    const bottom = s.lensBottom;
     const halfWidth = Math.max(10, s.w * 0.011);
     const gradient = ctx.createLinearGradient(s.lensX - halfWidth, 0, s.lensX + halfWidth, 0);
     gradient.addColorStop(0, rgba(p.lens, 0.22));
@@ -522,9 +544,18 @@ canvas {
     ctx.shadowColor = rgba(p.lens, 0.45);
     ctx.shadowBlur = 18;
     ctx.beginPath();
-    ctx.moveTo(s.lensX, top);
-    ctx.bezierCurveTo(s.lensX + halfWidth * 1.7, top + s.h * 0.13, s.lensX + halfWidth * 1.7, bottom - s.h * 0.13, s.lensX, bottom);
-    ctx.bezierCurveTo(s.lensX - halfWidth * 1.7, bottom - s.h * 0.13, s.lensX - halfWidth * 1.7, top + s.h * 0.13, s.lensX, top);
+    if (state.sign < 0) {
+      const edge = halfWidth * 1.45;
+      ctx.moveTo(s.lensX-edge, top);
+      ctx.lineTo(s.lensX+edge, top);
+      ctx.bezierCurveTo(s.lensX+2, s.axisY-22, s.lensX+2, s.axisY+22, s.lensX+edge, bottom);
+      ctx.lineTo(s.lensX-edge, bottom);
+      ctx.bezierCurveTo(s.lensX-2, s.axisY+22, s.lensX-2, s.axisY-22, s.lensX-edge, top);
+    } else {
+      ctx.moveTo(s.lensX, top);
+      ctx.bezierCurveTo(s.lensX + halfWidth * 1.7, top + s.h * 0.13, s.lensX + halfWidth * 1.7, bottom - s.h * 0.13, s.lensX, bottom);
+      ctx.bezierCurveTo(s.lensX - halfWidth * 1.7, bottom - s.h * 0.13, s.lensX - halfWidth * 1.7, top + s.h * 0.13, s.lensX, top);
+    }
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
@@ -533,7 +564,7 @@ canvas {
     ctx.beginPath();
     ctx.arc(s.lensX, s.axisY, 3.5, 0, Math.PI * 2);
     ctx.fill();
-    roundedLabel('凸透镜', s.lensX, top - 18, p);
+    roundedLabel(state.sign > 0 ? '凸透镜' : '凹透镜', s.lensX, top - 18, p);
     roundedLabel('光心 O', s.lensX + 10, s.axisY - 18, p, 'left');
   }
 
@@ -541,42 +572,45 @@ canvas {
     const marginX = s.w + 24;
     const tipX = s.objectX;
     const tipY = s.objectTipY;
-    const outgoing = [];
 
     const hitParallel = { x: s.lensX, y: tipY };
-    const slopeParallel = (s.axisY - tipY) / s.f;
+    const slopeParallel = (s.axisY - tipY) / s.signedF;
     const endParallel = { x: marginX, y: tipY + slopeParallel * (marginX - s.lensX) };
     raySegment(tipX, tipY, hitParallel.x, hitParallel.y, p.rayParallel);
     raySegment(hitParallel.x, hitParallel.y, endParallel.x, endParallel.y, p.rayParallel);
-    outgoing.push(hitParallel);
 
     const hitCenter = { x: s.lensX, y: s.axisY };
     const slopeCenter = (s.axisY - tipY) / Math.max(1, s.lensX - tipX);
     const endCenter = { x: marginX, y: s.axisY + slopeCenter * (marginX - s.lensX) };
     raySegment(tipX, tipY, hitCenter.x, hitCenter.y, p.rayCenter);
     raySegment(hitCenter.x, hitCenter.y, endCenter.x, endCenter.y, p.rayCenter);
-    outgoing.push(hitCenter);
 
-    if (ui.thirdRay.checked && Math.abs(s.ratio - 1) > 0.035) {
-      const focusX = s.lensX - s.f;
+    if (ui.thirdRay.checked && !s.atFocus) {
+      const focusX = s.lensX - s.signedF;
       const slopeFocus = (s.axisY - tipY) / (focusX - tipX);
       const hitFocus = { x: s.lensX, y: tipY + slopeFocus * (s.lensX - tipX) };
-      if (s.ratio < 1 && ui.labels.checked) {
-        raySegment(focusX, s.axisY, tipX, tipY, rgba(p.rayFocus, 0.55), [5, 5]);
+      if (hitFocus.y >= s.lensTop && hitFocus.y <= s.lensBottom) {
+        if (state.sign < 0) {
+          raySegment(hitFocus.x, hitFocus.y, focusX, s.axisY, rgba(p.rayFocus, 0.65), [5, 5]);
+        } else if (s.ratio < 1) {
+          raySegment(focusX, s.axisY, tipX, tipY, rgba(p.rayFocus, 0.65), [5, 5]);
+        }
+        raySegment(tipX, tipY, hitFocus.x, hitFocus.y, p.rayFocus);
+        raySegment(hitFocus.x, hitFocus.y, marginX, hitFocus.y, p.rayFocus);
       }
-      raySegment(tipX, tipY, hitFocus.x, hitFocus.y, p.rayFocus);
-      raySegment(hitFocus.x, hitFocus.y, marginX, hitFocus.y, p.rayFocus);
-      outgoing.push(hitFocus);
     }
 
-    if (s.ratio < 1 && !s.atFocus && Number.isFinite(s.imageX)) {
-      outgoing.slice(0, 2).forEach(hit => {
-        raySegment(hit.x, hit.y, s.imageX, s.imageTipY, rgba(p.muted, 0.7), [6, 5]);
-      });
+    if (s.v < 0 && Number.isFinite(s.imageX)) {
+      const backX = state.sign < 0 ? s.lensX - s.f : s.imageX;
+      raySegment(hitParallel.x, hitParallel.y, backX, tipY + slopeParallel * (backX - s.lensX), rgba(p.rayParallel, 0.72), [6, 5]);
+      // The incident central ray already passes through the virtual image of a diverging lens.
+      if (s.imageX < tipX) {
+        raySegment(tipX, tipY, s.imageX, s.imageTipY, rgba(p.rayCenter, 0.72), [6, 5]);
+      }
     }
   }
 
-  function drawImage(s, p, info) {
+  function drawImage(s, p) {
     const withinX = Number.isFinite(s.imageX) && s.imageX > 16 && s.imageX < s.w - 16;
     const withinY = Number.isFinite(s.imageTipY) && s.imageTipY > -s.h * 0.5 && s.imageTipY < s.h * 1.5;
     if (s.atFocus) {
@@ -584,7 +618,7 @@ canvas {
       return;
     }
     if (withinX && withinY) {
-      drawArrowObject(s.imageX, s.imageBaseY, s.imageTipY, p.image, info.key === 'inside' ? '虚像' : '实像', p, info.key === 'inside');
+      drawArrowObject(s.imageX, s.imageBaseY, s.imageTipY, p.image, s.v < 0 ? '虚像' : '实像', p, s.v < 0);
       return;
     }
     if (ui.labels.checked) {
@@ -599,12 +633,14 @@ canvas {
     ui.result.textContent = info.result;
     ui.badge.textContent = info.badge;
     ui.footnote.textContent = info.foot;
-    ui.distance.textContent = `物距约 ${s.ratio.toFixed(2)}f`;
+    ui.distance.textContent = `物距 ${s.ratio.toFixed(2)} |f|　·　放大率 ${s.atFocus ? '—' : s.magnification.toFixed(2)}`;
+    root.querySelector('#parallel-key').textContent = state.sign > 0 ? '平行入射 → 通过远侧焦点' : '平行入射 → 反向延长线通过近侧焦点';
+    root.querySelector('#focus-key').textContent = state.sign > 0 ? '经过近侧焦点或其延长线 → 平行出射' : '指向远侧焦点 → 平行出射';
 
     const selectedKey = info.key;
     const map = { far: '2.65', two: '2', middle: '1.5', focus: '1', inside: '0.65' };
     ui.zones.forEach(button => {
-      const selected = button.dataset.ratio === map[selectedKey];
+      const selected = state.sign > 0 ? button.dataset.ratio === map[selectedKey] : Math.abs(s.ratio - Number(button.dataset.ratio)) < 1e-8;
       button.classList.toggle('btn-primary', selected);
       button.setAttribute('aria-pressed', String(selected));
     });
@@ -620,13 +656,13 @@ canvas {
     drawSpecialRays(s, p);
     drawLens(s, p);
     drawArrowObject(s.objectX, s.objectBaseY, s.objectTipY, p.object, '物体', p);
-    drawImage(s, p, info);
+    drawImage(s, p);
     updateText(s, info);
   }
 
   function reset() {
-    state.lensX = 0.58;
-    state.objectX = 0.301;
+    state.lensX = initialLensX;
+    state.objectX = initialObjectX;
     state.objectBaseY = 0.56;
     ui.labels.checked = true;
     ui.thirdRay.checked = true;
@@ -642,6 +678,15 @@ canvas {
     });
   });
   ui.reset.addEventListener('click', reset);
+  const lenses = [...root.querySelectorAll('[data-lens]')];
+  lenses.forEach(button => button.addEventListener('click', () => {
+    state.sign = Number(button.dataset.lens);
+    lenses.forEach(lens => {
+      lens.setAttribute('aria-pressed', String(lens === button));
+      lens.classList.toggle('btn-primary', lens === button);
+    });
+    draw();
+  }));
   ui.labels.addEventListener('change', draw);
   ui.thirdRay.addEventListener('change', draw);
 
@@ -659,9 +704,11 @@ canvas {
     const px = point.x * s.w;
     const py = point.y * s.h;
     const objectNear = Math.abs(px - s.objectX) < 28 && py > Math.min(s.objectTipY, s.objectBaseY) - 24 && py < Math.max(s.objectTipY, s.objectBaseY) + 24;
-    const lensNear = Math.abs(px - s.lensX) < 28 && py > s.h * 0.12 && py < s.h * 0.92;
+    const lensNear = Math.abs(px - s.lensX) < 28 && py >= s.lensTop && py <= s.lensBottom;
     state.dragging = objectNear ? 'object' : lensNear ? 'lens' : null;
     if (!state.dragging) return;
+    state.grabOffsetX = (state.dragging === 'object' ? state.objectX : state.lensX) - point.x;
+    state.grabOffsetY = state.objectBaseY - point.y;
     state.pointerId = event.pointerId;
     canvas.setPointerCapture(event.pointerId);
   });
@@ -670,10 +717,10 @@ canvas {
     if (!state.dragging || event.pointerId !== state.pointerId) return;
     const point = pointerPosition(event);
     if (state.dragging === 'object') {
-      state.objectX = Math.max(0.055, Math.min(state.lensX - 0.045, point.x));
-      state.objectBaseY = Math.max(0.28, Math.min(0.82, point.y));
+      state.objectX = Math.max(0.055, Math.min(state.lensX - 0.045, point.x + state.grabOffsetX));
+      state.objectBaseY = Math.max(0.30, Math.min(0.82, point.y + state.grabOffsetY));
     } else {
-      state.lensX = Math.max(state.objectX + 0.05, Math.min(0.78, point.x));
+      state.lensX = Math.max(state.objectX + 0.045, Math.min(0.78, point.x + state.grabOffsetX));
     }
     draw();
   });

@@ -1,0 +1,312 @@
+<!doctype html>
+<!--
+MIT License
+
+Copyright (c) 2026 Yiyan Bai
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f8f6ef">
+<title>阿基米德浮沉实验 · 白翊言的物理手记</title>
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f8f6ef;
+  --ink: #182c37;
+  --muted: #55655f;
+  --line: #cecfc3;
+  --rust: #aa4229;
+  --teal: #25695f;
+  --serif: "Songti SC", "STSong", "Noto Serif CJK SC", SimSun, Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); font: 16px/1.6 var(--sans); }
+button, input { font: inherit; }
+button { color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid #bf562f; outline-offset: 2px; }
+h1, h2, p, figure, dl, dd { margin: 0; }
+.wrap { width: min(1100px, calc(100% - 64px)); margin-inline: auto; }
+header { border-bottom: 1px solid var(--line); }
+.mast, .title-row, .panel-heading, .setting-heading, .limits, .instrument-heading {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.mast { min-height: 59px; }
+.brand { font: 700 17px var(--serif); letter-spacing: .035em; }
+.brand i { margin-inline: .25em; color: #818a80; font: normal 15px var(--sans); }
+.subject { font-size: 13px; color: var(--muted); }
+.title-row { align-items: flex-end; padding: 28px 0 22px; }
+h1 { font: 700 clamp(34px, 4vw, 52px)/1.18 var(--serif); letter-spacing: -.04em; }
+.intro { margin-top: 8px; color: var(--muted); }
+.bench { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(305px, 1fr); }
+.stage { display: flex; flex-direction: column; min-width: 0; color: #f9f6e9; background: #142c37; border-radius: 5px 0 0 5px; }
+.instrument-heading { padding: 16px 24px 0; }
+.instrument-heading h2 { font: 600 15px/1.5 var(--sans); letter-spacing: .06em; }
+.instrument-heading span { color: #c1d1c9; font-size: 12px; }
+.field {
+  flex: 1; display: grid; place-items: center; margin-top: 6px;
+  background-image: linear-gradient(#c2decc0b 1px, transparent 1px), linear-gradient(90deg, #c2decc0b 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+.field svg { display: block; width: 100%; max-width: 600px; height: auto; }
+svg text { font-family: var(--sans); font-size: 16px; }
+.readings { display: grid; grid-template-columns: 1fr 1fr; padding: 14px 24px 17px; border-top: 1px solid #51656b; background: #102630; border-radius: 0 0 0 5px; }
+.readings > div + div { padding-left: 22px; border-left: 1px solid #4a6064; }
+.readings dt { color: #c0d2cc; font-size: 13px; }
+.readings dd { margin-top: 3px; font: 700 28px/1.3 var(--serif); }
+#fraction { font: 500 32px/1.15 var(--mono); color: #b6e3cf; }
+.controls { min-width: 0; background: #fffdf6; border: 1px solid var(--line); border-left: 0; border-radius: 0 5px 5px 0; padding: 15px 22px 18px; }
+.panel-heading { padding-bottom: 9px; border-bottom: 1px solid var(--line); }
+.panel-heading h2, .note h2 { font: 700 21px/1.45 var(--serif); }
+.reset { min-height: 42px; background: none; border: 0; padding: 4px; font-size: 13px; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
+.reset:hover { color: var(--rust); }
+.setting { --accent: var(--rust); padding-top: 16px; }
+.setting + .setting { --accent: var(--teal); margin-top: 16px; border-top: 1px solid var(--line); }
+.setting-heading label { font-weight: 650; font-size: 16px; }
+.value { font: 600 24px/1.4 var(--mono); color: var(--accent); }
+.unit { font: 12px var(--mono); color: var(--muted); white-space: nowrap; }
+input[type=range] { display: block; width: 100%; height: 36px; margin: 0; cursor: pointer; accent-color: var(--accent); }
+.limits { font: 11px var(--mono); color: var(--muted); }
+.presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-top: 10px; }
+.presets button { min-height: 42px; border: 1px solid #cbd0c5; border-radius: 3px; background: transparent; font-size: 14px; }
+.presets button:hover { border-color: var(--accent); }
+.presets button[aria-pressed=true] { border-color: var(--accent); color: var(--accent); font-weight: 700; background: #f7e9db; }
+.setting + .setting button[aria-pressed=true] { background: #e2efe6; }
+.equal { margin-top: 12px; min-height: 42px; padding: 4px 0; border: 0; background: none; color: var(--teal); font-size: 14px; text-align: left; text-decoration: underline; text-underline-offset: 4px; }
+.notes { display: grid; grid-template-columns: 1.65fr 1fr; gap: 30px; margin: 23px 0 30px; }
+.note { padding-top: 12px; border-top: 1px solid var(--line); }
+.note h2 { font-size: 19px; }
+.note p { margin-top: 6px; color: var(--muted); font-size: 15px; }
+.note strong { color: var(--ink); }
+summary { width: fit-content; cursor: pointer; color: var(--rust); font-size: 14px; padding-block: 8px; }
+@media (max-width: 760px) {
+  .wrap { width: min(590px, calc(100% - 32px)); }
+  .mast { min-height: 48px; }
+  .title-row { padding: 17px 0 13px; }
+  .intro { font-size: 15px; margin-top: 4px; }
+  .bench, .notes { grid-template-columns: minmax(0, 1fr); }
+  .stage { border-radius: 5px 5px 0 0; }
+  .instrument-heading { padding: 12px 16px 0; }
+  .field svg { max-width: 450px; }
+  .readings { padding: 9px 16px; border-radius: 0; }
+  .readings dt { font-size: 12px; }
+  .readings dd { font-size: 23px; }
+  #fraction { font-size: 26px; }
+  .controls { padding: 8px 16px 10px; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 5px 5px; }
+  .setting { padding-top: 10px; }
+  .setting + .setting { margin-top: 12px; }
+  .notes { gap: 16px; margin-top: 16px; }
+}
+</style>
+</head>
+<body>
+<header><div class="wrap mast">
+  <span class="brand">白翊言<i>/</i>物理手记</span>
+  <span class="subject">课堂实验室 · 浮力</span>
+</div></header>
+<main class="wrap">
+  <div class="title-row"><div>
+    <h1>阿基米德浮沉实验</h1>
+    <p class="intro">同一个方块，换一种液体，会浮得更高吗？</p>
+  </div></div>
+  <div class="bench">
+    <figure class="stage" aria-labelledby="tank-title">
+      <div class="instrument-heading"><h2 id="tank-title">水槽侧视图</h2><span>从液面下静止释放</span></div>
+      <div class="field">
+        <svg id="tank" viewBox="0 0 500 278" role="img" aria-labelledby="tank-title tank-description">
+          <desc id="tank-description">方块漂浮在液面，60% 的体积浸入液体。</desc>
+          <defs>
+            <linearGradient id="water-fill" x2="0" y2="1" gradientUnits="objectBoundingBox">
+              <stop stop-color="#459b99" stop-opacity=".72"/><stop offset="1" stop-color="#1b5563" stop-opacity=".9"/>
+            </linearGradient>
+            <pattern id="hatching" width="9" height="9" patternUnits="userSpaceOnUse">
+              <path d="M-2 2 2 -2 M0 9 9 0 M7 11 11 7" fill="none" stroke="#795336" stroke-width="1" opacity=".34"/>
+            </pattern>
+            <pattern id="mesh" width="8" height="6" patternUnits="userSpaceOnUse">
+              <path d="m0 6 6-6m1 7 6-6" fill="none" stroke="#b9d2c8" stroke-width="1.2"/>
+            </pattern>
+            <clipPath id="vessel"><path d="M53 25H447V243Q447 252 438 252H62Q53 252 53 243Z"/></clipPath>
+            <clipPath id="immersed"><rect id="wet-area" x="53" y="94.2" width="394" height="170"/></clipPath>
+            <g id="block-shape">
+              <rect x="190" width="82" height="82" rx="1.5"/>
+              <rect x="190" width="82" height="82" rx="1.5" fill="url(#hatching)" stroke="none"/>
+              <path d="M197 9v64m0-48h6m-6 16h9m-9 16h6" fill="none" stroke="currentColor" opacity=".55"/>
+            </g>
+          </defs>
+          <g clip-path="url(#vessel)">
+            <rect id="water" x="53" y="94.2" width="394" height="240" fill="url(#water-fill)"/>
+            <path d="M65 43h10m-10 14h6m-6 14h10m-10 14h6m-6 14h10m-10 14h6m-6 14h10m-10 14h6m-6 14h10m-10 14h6m-6 14h10m-10 14h6m-6 14h10m-10 14h6" fill="none" stroke="#c2d9d4" opacity=".62"/>
+            <use id="block" href="#block-shape" transform="translate(0 61.4)" fill="#e6b076" stroke="#f6d5a5" stroke-width="2" color="#5f4937"/>
+            <g clip-path="url(#immersed)"><use id="wet-block" href="#block-shape" transform="translate(0 61.4)" fill="#a5b296" stroke="#dbdbc2" stroke-width="2" color="#3f5a51"/></g>
+            <g id="surface" transform="translate(0 94.2)">
+              <path d="M53 -3Q57 0 62 0H438Q443 0 447 -3" fill="none" stroke="#b8ead7" stroke-width="2"/>
+              <text x="430" y="-9" fill="#c5e8de" text-anchor="end">液面</text>
+            </g>
+            <g fill="#d9eadf" stroke="#d9eadf">
+              <path id="bracket" d="M282 94.2h7v49.2h-7" fill="none" stroke-width="1.5"/>
+              <text id="bracket-label" x="298" y="124" stroke="none">浸入部分</text>
+            </g>
+            <rect x="56" y="240" width="388" height="6" fill="url(#mesh)"/>
+            <path d="M56 240H444" stroke="#b9d2c8"/>
+          </g>
+          <path d="M45 25h8v218q0 9 9 9h376q9 0 9-9V25h8" fill="none" stroke="#d7e2d9" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M49 31v213q0 12 12 12h378q12 0 12-12V31" fill="none" stroke="#7e9d9d"/>
+          <path d="M32 258H468" fill="none" stroke="#93a6a3" opacity=".56"/>
+        </svg>
+      </div>
+      <figcaption><dl class="readings">
+        <div><dt>最终状态</dt><dd id="state">漂浮</dd></div>
+        <div><dt>浸入体积占比</dt><dd id="fraction">60%</dd></div>
+      </dl></figcaption>
+    </figure>
+    <section class="controls" aria-labelledby="settings-title">
+      <div class="panel-heading"><h2 id="settings-title">调节密度</h2><button type="button" class="reset" id="reset">复位</button></div>
+      <div class="setting">
+        <div class="setting-heading">
+          <label for="object">物体密度</label>
+          <span><span class="value" id="object-value">0.60</span> <span class="unit">g/cm³</span></span>
+        </div>
+        <input type="range" min="0.20" max="2.00" step="0.01" value="0.60" id="object">
+        <div class="limits" aria-hidden="true"><span>0.20</span><span>2.00</span></div>
+        <div class="presets" role="group" aria-label="物体密度示例">
+          <button type="button" data-target="object" value="0.60" aria-pressed="true">木块</button>
+          <button type="button" data-target="object" value="0.92" aria-pressed="false">冰块</button>
+          <button type="button" data-target="object" value="1.30" aria-pressed="false">树脂块</button>
+        </div>
+      </div>
+      <div class="setting">
+        <div class="setting-heading">
+          <label for="liquid">液体密度</label>
+          <span><span class="value" id="liquid-value">1.00</span> <span class="unit">g/cm³</span></span>
+        </div>
+        <input type="range" min="0.70" max="1.40" step="0.01" value="1.00" id="liquid">
+        <div class="limits" aria-hidden="true"><span>0.70</span><span>1.40</span></div>
+        <div class="presets" role="group" aria-label="液体密度示例">
+          <button type="button" data-target="liquid" value="0.79" aria-pressed="false">酒精</button>
+          <button type="button" data-target="liquid" value="1.00" aria-pressed="true">清水</button>
+          <button type="button" data-target="liquid" value="1.20" aria-pressed="false">浓盐水</button>
+        </div>
+      </div>
+      <button type="button" class="equal" id="equal">将物体密度调至与液体相同</button>
+    </section>
+  </div>
+  <div class="notes">
+    <section class="note" aria-labelledby="reading-title">
+      <h2 id="reading-title">读懂现象</h2>
+      <p><strong id="comparison">物体密度小于液体密度。</strong><span id="reason">方块上浮，露出液面后达到平衡，此时浮力等于重力。</span></p>
+      <p id="calculation">漂浮时，浸入体积占比 = 物体密度 ÷ 液体密度 = 0.60 ÷ 1.00 = 60%。</p>
+    </section>
+    <section class="note" aria-labelledby="challenge-title">
+      <h2 id="challenge-title">试一试</h2>
+      <p>选冰块，先放进酒精，再换成清水。哪一次能在液面上看到冰？露出的体积占多少？</p>
+      <details><summary>核对观察</summary><p>冰块在酒精中沉底，在清水中漂浮。清水中浸入的体积占 92%，露出的体积占 8%。</p></details>
+    </section>
+  </div>
+</main>
+<script>
+(() => {
+  const byId = id => document.getElementById(id);
+  const object = byId('object');
+  const liquid = byId('liquid');
+  const presets = document.querySelectorAll('[data-target]');
+  const side = 82;
+  const meshTop = 240;
+  const releaseTop = 130;
+
+  function render() {
+    const objectDensity = object.valueAsNumber;
+    const liquidDensity = liquid.valueAsNumber;
+    const floating = objectDensity < liquidDensity;
+    const suspended = objectDensity === liquidDensity;
+    const fraction = Math.min(1, objectDensity / liquidDensity);
+    const percent = Number((100 * fraction).toFixed(1)) + '%';
+    // 液体体积固定。排开整个方块的体积时，液面比空载时高 18 个绘图单位。
+    const surfaceY = 105 - 18 * fraction;
+    let top = meshTop - side;
+    let state = '沉底';
+    let relation = '大于';
+    let reason = '方块下沉到槽底的透水托网。静止时，浮力和托网的支持力之和等于重力。';
+    let calculation = '方块全部浸入液体，排开液体的体积等于方块的体积。';
+    if (floating) {
+      top = surfaceY - side * (1 - fraction);
+      state = '漂浮';
+      relation = '小于';
+      reason = '方块上浮，露出液面后达到平衡，此时浮力等于重力。';
+      const sign = Math.abs(100 * fraction - parseFloat(percent)) < 1e-9 ? '=' : '≈';
+      calculation = '漂浮时，浸入体积占比 = 物体密度 ÷ 液体密度 = ' +
+        objectDensity.toFixed(2) + ' ÷ ' + liquidDensity.toFixed(2) + ' ' + sign + ' ' + percent + '。';
+    } else if (suspended) {
+      top = releaseTop;
+      state = '悬浮';
+      relation = '等于';
+      reason = '方块完全浸没时，浮力等于重力。它停在释放处，换一个完全浸没的深度静止释放，也能悬浮。';
+    }
+
+    byId('water').setAttribute('y', surfaceY);
+    byId('wet-area').setAttribute('y', surfaceY);
+    byId('surface').setAttribute('transform', 'translate(0 ' + surfaceY + ')');
+    for (const id of ['block', 'wet-block']) {
+      byId(id).setAttribute('transform', 'translate(0 ' + top + ')');
+    }
+    const wetTop = Math.max(surfaceY, top);
+    const wetHeight = top + side - wetTop;
+    byId('bracket').setAttribute('d', 'M282 ' + wetTop + 'h7v' + wetHeight + 'h-7');
+    byId('bracket-label').setAttribute('y', wetTop + wetHeight / 2 + 5);
+    byId('tank-description').textContent = '方块' + state + '，浸入液体的体积占 ' + percent + '。';
+    byId('state').textContent = state;
+    byId('fraction').textContent = percent;
+    byId('comparison').textContent = '物体密度' + relation + '液体密度。';
+    byId('reason').textContent = reason;
+    byId('calculation').textContent = calculation;
+    for (const input of [object, liquid]) {
+      const density = input.valueAsNumber.toFixed(2);
+      byId(input.id + '-value').textContent = density;
+      input.setAttribute('aria-valuetext', density + ' 克每立方厘米，' + state + '，浸入 ' + percent);
+    }
+    for (const button of presets) {
+      button.setAttribute('aria-pressed', String(byId(button.dataset.target).valueAsNumber === Number(button.value)));
+    }
+  }
+
+  for (const input of [object, liquid]) input.addEventListener('input', render);
+  for (const button of presets) {
+    button.addEventListener('click', () => {
+      byId(button.dataset.target).value = button.value;
+      render();
+    });
+  }
+  byId('equal').addEventListener('click', () => {
+    object.value = liquid.value;
+    render();
+  });
+  byId('reset').addEventListener('click', () => {
+    object.value = object.defaultValue;
+    liquid.value = liquid.defaultValue;
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
