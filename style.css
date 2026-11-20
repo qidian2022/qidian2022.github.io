@@ -87,15 +87,17 @@ h2 { font: 700 clamp(2.12rem, 3.15vw, 3.05rem)/1.23 var(--serif); margin-top: 9p
 .grade { background: #d5e5d7; font: 700 1.4rem var(--serif); }
 .outdoors { padding: clamp(42px, 6vw, 78px) 0; }
 .outdoors .section-heading { margin-bottom: 10px; }
-.photo-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; margin-top: 24px; }
+.photo-grid { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 20px; margin-top: 24px; }
+.photo-grid > figure { grid-column: span 3; }
 .photo-grid img { width: 100%; aspect-ratio: 3/2; object-fit: cover; border-radius: 3px; }
-.photo-grid .trail-photo { width: min(100%, 240px); justify-self: center; }
-.photo-grid .trail-photo img { aspect-ratio: 2/3; object-fit: contain; }
-.trail-photo .race-name { display: inline-block; }
+.photo-grid .portrait-photo { grid-column: span 2; width: min(100%, 270px); justify-self: center; }
+.photo-grid .portrait-photo img { height: auto; aspect-ratio: 3/4; object-fit: contain; }
+.portrait-photo .race-name { display: inline-block; }
 .photo-grid figcaption { margin-top: 5px; color: var(--muted); font-size: .89rem; }
 @media (max-width: 680px) {
   .contact { grid-column: 2 / -1; }
   .photo-grid { grid-template-columns: 1fr; }
+  .photo-grid > figure, .photo-grid .portrait-photo { grid-column: 1; }
 }
 .topic { display: flex; align-items: center; gap: .5rem; font-weight: 550; font-size: .84rem; color: var(--mint); }
 .topic span { font: .75rem var(--mono); letter-spacing: .12em; color: #b6c7c3; }
