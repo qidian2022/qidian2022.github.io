@@ -1,0 +1,151 @@
+<!doctype html>
+<!--
+MIT License
+
+Copyright (c) 2026 Yiyan Bai
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>潜水蛙的压强实验 · 课堂演示</title>
+<style>
+:root{--ink:#163f46;--muted:#648087;--teal:#157e83;--line:#dae6e3;--paper:#f5f7ef;--warm:#f8cb59}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif}button,input{font:inherit}button{cursor:pointer;color:inherit}button:focus-visible,input:focus-visible{outline:3px solid #db9e22;outline-offset:4px}main{max-width:1460px;margin:auto;padding:28px 38px 20px}header{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px}.eyebrow{font-size:11px;letter-spacing:2px;font-weight:700;color:var(--teal)}h1{font-size:32px;letter-spacing:-1px;margin:7px 0 8px}header p{font-size:14px;color:var(--muted);margin:0}.outline{background:transparent;border:1px solid #cbdad6;border-radius:12px;padding:10px 16px;white-space:nowrap}.outline:hover{background:#e9efdf}.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px}.stage{position:relative;overflow:hidden;background:#e9f2ed;border-radius:24px;border:1px solid #d1e3df;align-self:start}.stage-top{position:absolute;top:22px;left:24px;right:24px;display:flex;justify-content:space-between;align-items:center;z-index:1;font-size:13px}.pill{display:inline-flex;align-items:center;gap:7px;background:#fffffff0;border:1px solid #ffffff;border-radius:30px;padding:8px 13px}.dot{width:7px;height:7px;background:var(--teal);border-radius:50%}.stage svg{display:block;width:100%;touch-action:none;cursor:ns-resize}.stage-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 23px;background:#fafff8;font-size:12px;color:var(--muted)}.stage-bottom label{display:flex;gap:6px;align-items:center;white-space:nowrap}input[type=checkbox]{accent-color:var(--teal)}aside{display:flex;flex-direction:column;gap:15px}.card{background:#fffef8;border:1px solid var(--line);border-radius:20px;padding:22px}.section-label{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.5px}.card h2{margin:0 0 16px;font-size:17px}.liquids{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.liquids button{border:1px solid #d6e3df;background:#f6f9f3;border-radius:12px;padding:13px 3px;font-size:14px;font-weight:600}.liquids button small{display:block;font-size:11px;font-weight:400;margin-top:5px;opacity:.8}.liquids button[aria-pressed=true]{background:var(--teal);color:#fff;border-color:var(--teal)}.density-note{font-size:11px;color:var(--muted);margin:12px 0 0}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.depth-number{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums}.unit{font-size:14px;font-weight:400}.slider{width:100%;height:8px;accent-color:var(--teal);cursor:pointer;margin:25px 0 12px}.ticks{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.presets{display:flex;gap:7px;margin-top:17px}.presets button{flex:1;border:1px solid var(--line);background:#f5f7f0;border-radius:8px;padding:7px 2px;font-size:12px}.presets button:hover{background:#e5eee7}.actions{display:flex;gap:8px;margin-top:12px}.actions button{flex:1;border:0;border-radius:10px;padding:11px 3px;font-size:13px;background:var(--ink);color:white}.actions button:last-child{background:#eaf0e6;color:var(--ink)}.reading{background:#163f46;color:#fff;border:0;position:relative;overflow:hidden}.reading .section-label{color:#afcece}.pressure-number{font-size:53px;letter-spacing:-2px;line-height:1.15;margin-top:13px;font-weight:700;font-variant-numeric:tabular-nums}.pressure-number .unit{font-size:19px;letter-spacing:0;color:#d4e5df}.formula{margin-top:15px;border-top:1px solid #ffffff26;padding-top:14px;font-size:17px;letter-spacing:1px}.calc{font-size:12px;color:#c0d5d2;margin-top:8px;font-variant-numeric:tabular-nums;min-height:18px}.meter{height:5px;background:#ffffff22;border-radius:5px;margin-top:18px}.meter div{height:100%;background:var(--warm);border-radius:5px}.mini{font-size:11px;color:#b6cecc;margin:10px 0 0;line-height:1.5}.bottom{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;margin-top:20px}.lesson{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}.lesson h2{font-size:17px;margin:0 0 8px}.lesson p{font-size:14px;line-height:1.9;margin:0;color:var(--muted)}.lesson strong{color:var(--ink)}.lesson>div+div{border-left:1px solid var(--line);padding-left:24px}.comparison h2{font-size:14px;margin:0 0 15px}.bar-row{display:grid;grid-template-columns:30px 1fr 72px;align-items:center;gap:10px;font-size:11px;margin-top:10px}.bar-track{height:7px;background:#e7eeea;border-radius:8px}.bar{height:100%;border-radius:8px;background:#9ebcb5}.bar-row.active .bar{background:var(--teal)}.bar-row.active{font-weight:700}.bar-row output{text-align:right;font-variant-numeric:tabular-nums}footer{font-size:11px;line-height:1.8;color:#70877f;margin:15px 2px 0}svg text{font-family:inherit}.bubble{animation:rise 9s linear infinite;opacity:0} @keyframes rise{0%{transform:translateY(20px);opacity:0}20%{opacity:.45}80%{opacity:.3}100%{transform:translateY(-390px);opacity:0}}@media(prefers-reduced-motion:reduce){.bubble{animation:none;opacity:.3}}@media(min-width:1500px){main{padding-top:38px}}@media(max-width:1000px){main{padding:22px}.layout{grid-template-columns:minmax(0,1fr) 300px;gap:16px}.bottom{grid-template-columns:1fr 300px;gap:16px}.card{padding:18px}.stage-top{font-size:11px;left:16px;right:16px;top:16px}.stage-bottom{padding:13px;font-size:10px}.lesson{grid-template-columns:1fr;gap:12px}.lesson>div+div{border-left:0;border-top:1px solid var(--line);padding:12px 0 0}}@media(max-width:760px){main{padding:18px 14px}.layout,.bottom{grid-template-columns:1fr}.stage{order:0}aside{display:grid;grid-template-columns:1fr 1fr;gap:12px}.depth-card{grid-column:1/-1;grid-row:1}.liquids{gap:4px}.liquids button{font-size:12px}.liquids button small{font-size:10px}.card{padding:16px}.pressure-number{font-size:36px}.formula{font-size:15px}.calc{font-size:10px}h1{font-size:27px}header p{font-size:12px;line-height:1.6}.stage-top{top:13px;font-size:10px}.pill{padding:6px 9px}.lesson{grid-template-columns:1fr 1fr}.lesson>div+div{border-top:0;border-left:1px solid var(--line);padding:0 0 0 14px}.lesson p{font-size:12px}.lesson h2{font-size:15px}.bottom{gap:12px;margin-top:12px}.stage-bottom{font-size:10px;gap:6px}}@media(max-width:400px){aside{display:flex}.stage-top{right:10px;left:10px}.stage-bottom{flex-wrap:wrap}.lesson{grid-template-columns:1fr}.lesson>div+div{border:0;padding:0}}
+.lab-nav{margin:0 0 22px}.lab-nav a{display:inline-block;padding:5px 0;color:#386761;font-size:14px;text-decoration:none}.lab-nav a:hover{text-decoration:underline}.lab-nav a:focus-visible{outline:3px solid #bb602e;outline-offset:3px}header{gap:10px}header .outline{flex-shrink:0}header p{line-height:1.7}
+</style>
+</head>
+<body><main>
+<nav class="lab-nav" aria-label="返回主页"><a href="../index.html#labs"><span aria-hidden="true">←</span> 课堂演示</a></nav>
+<header><div><div class="eyebrow">LIQUID PRESSURE LAB · 液体压强</div><h1>潜水蛙的压强实验</h1><p>把潜水蛙放进不同的液体，再把它拖到同一深度，比较腹部测压点的读数。</p></div><button class="outline" id="reset">↺ 重置</button></header>
+<div class="layout">
+<section class="stage" aria-label="液体压强动态演示">
+<div class="stage-top"><span class="pill"><span class="dot"></span><span id="liquidLabel">水 · ρ = 1000 kg/m³</span></span><span class="pill">↕ 拖动水中位置调节深度</span></div>
+<svg id="tank" viewBox="0 0 860 740" role="img" aria-labelledby="sceneTitle sceneDesc">
+<title id="sceneTitle">潜水蛙在水中潜水</title><desc id="sceneDesc">调节深度或液体种类，潜水蛙受压后变瘦，四周向内的箭头随压强增大而增强。</desc>
+<defs>
+<linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop id="waterTop" stop-color="#a9e4df"/><stop id="waterMid" offset=".55" stop-color="#63b8c2"/><stop id="waterBottom" offset="1" stop-color="#317e98"/></linearGradient>
+<linearGradient id="ray" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".3"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<filter id="shadow" x="-40%" y="-30%" width="180%" height="170%"><feDropShadow dx="3" dy="7" stdDeviation="6" flood-color="#153e40" flood-opacity=".18"/></filter>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="3.5" markerHeight="3.5" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#ffedab"/></marker>
+<g id="frogArt" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 充气潜水蛙。测压点位于腹部中央。 -->
+  <g fill="#91b98e" stroke="#1e5755" stroke-width="6">
+    <path d="M-53 12Q-73 17-94 50Q-102 66-85 67Q-66 60-48 44Z"/>
+    <path d="M51 11Q77 17 96 38Q109 51 96 61Q79 63 53 41Z"/>
+    <path d="M-46 59Q-64 87-69 103Q-68 115-52 110Q-36 97-25 71Z"/>
+    <path d="M43 62Q63 85 72 99Q74 112 59 111Q37 101 25 74Z"/>
+  </g>
+  <g stroke="#1d5654" stroke-width="5.5">
+    <path fill="#69b6a6" d="M-62 95Q-81 91-95 99L-82 105L-95 111Q-75 120-51 104Z"/>
+    <path fill="#69b6a6" d="M66 94Q82 90 100 95L89 103L103 106Q83 117 57 105Z"/>
+    <ellipse cx="0" cy="14" rx="65" ry="67" fill="#abd59c"/>
+    <ellipse cx="0" cy="31" rx="43" ry="39" fill="#e4ebbb" stroke="none"/>
+    <path fill="#a5d19a" d="M-72-52Q-76-83-49-93Q-26-106-14-80Q0-84 14-80Q29-106 53-92Q75-79 71-50Q76-20 40-10Q0 5-43-10Q-78-22-72-52Z"/>
+    <path d="M-71-49L-61-51M59-50L73-55" fill="none" stroke-width="9"/>
+    <rect x="-61" y="-75" width="52" height="36" rx="16" fill="#c5eff1"/>
+    <rect x="8" y="-75" width="52" height="36" rx="16" fill="#c5eff1"/>
+    <path d="M-8-57Q0-63 8-57" fill="none" stroke-width="7"/>
+    <path d="M-18-27Q0-12 21-29" fill="none" stroke-width="4"/>
+    <path d="M64-38Q85-38 83-59L80-100" stroke-width="10" fill="none"/>
+    <path d="M80-98L79-111" stroke="#ffac7c" stroke-width="12"/>
+  </g>
+  <g fill="#174b4d"><circle cx="-34" cy="-57" r="7"/><circle cx="32" cy="-57" r="7"/></g>
+  <g fill="#fff"><circle cx="-36" cy="-60" r="2"/><circle cx="30" cy="-60" r="2"/></g>
+</g>
+</defs>
+<rect width="860" height="740" fill="#edf4e9"/>
+<circle cx="698" cy="113" r="34" fill="#fff8d9" opacity=".8"/>
+<path d="M0 160Q70 149 140 160T280 160T420 160T560 160T700 160T840 160L860 160V740H0Z" fill="url(#water)"/>
+<path d="M90 161L205 700H390L185 161ZM425 161L505 660H570L485 161Z" fill="url(#ray)"/>
+<path d="M0 160Q70 149 140 160T280 160T420 160T560 160T700 160T840 160" fill="none" stroke="#f7ffef" stroke-width="3"/>
+<text x="36" y="143" fill="#5b8d89" font-size="13">液面</text>
+<g id="grid"></g>
+<g fill="none" stroke="#e6fff7" stroke-width="1.5"><circle class="bubble" cx="178" cy="620" r="6"/><circle class="bubble" style="animation-delay:-3s" cx="643" cy="656" r="8"/><circle class="bubble" style="animation-delay:-5s" cx="220" cy="580" r="4"/><circle class="bubble" style="animation-delay:-7s" cx="708" cy="610" r="4"/></g>
+<path d="M0 715Q140 697 280 718T570 716T860 711V740H0Z" fill="#cbd8b6" opacity=".65"/>
+<g fill="none" stroke="#215f6d" stroke-width="6" stroke-linecap="round" opacity=".35"><path d="M50 726Q33 692 51 666M63 731Q80 697 70 682M767 728Q747 699 758 680M781 731Q807 708 799 691"/></g>
+<g id="depthMark" stroke="#f0fffa" fill="none"><path id="depthLine" stroke-width="1.5" stroke-dasharray="5 5"/><path id="depthCaps" stroke-width="2"/></g>
+<g id="guide"><line id="pointLine" x1="106" x2="438" stroke="#ecfff7" stroke-dasharray="5 6" opacity=".65"/><rect id="depthTag" x="130" width="104" height="31" rx="15.5" fill="#f4fff4"/><text id="depthTagText" x="182" text-anchor="middle" fill="#22616a" font-size="13" font-weight="600"></text></g>
+<g id="diver"><g id="original" opacity=".2"><use href="#frogArt"/></g><g id="squeeze" filter="url(#shadow)"><use href="#frogArt"/></g><g id="arrows" fill="none" stroke="#ffedab" stroke-linecap="round" marker-end="url(#arrow)"></g><circle r="4" fill="#fffef0" stroke="#276b70" stroke-width="2"/></g>
+<g transform="translate(625 646)"><rect width="191" height="47" rx="13" fill="#164955" opacity=".76"/><circle cx="20" cy="23" r="4" fill="#ffdf83"/><text id="status" x="33" y="28" fill="#fff6cf" font-size="13">有一点挤，肚子收起来了</text></g>
+</svg>
+<div class="stage-bottom"><span>白点为测压点 · 箭头越强、潜水蛙越瘦 → 压强越大</span><label><input id="showOriginal" type="checkbox" checked> 显示原始体型</label></div>
+</section>
+<aside>
+<section class="card"><div class="section-label">选择液体</div><div class="liquids" role="group" aria-label="液体种类"><button data-liquid="sea" aria-pressed="false">海水<small>1030</small></button><button data-liquid="water" aria-pressed="true">水<small>1000</small></button><button data-liquid="alcohol" aria-pressed="false">酒精<small>800</small></button></div><p class="density-note">教学取值 · 密度单位 kg/m³</p></section>
+<section class="card depth-card"><div class="row"><label class="section-label" for="depth">调节深度</label><div class="depth-number"><output id="depthValue" for="depth">10.0</output> <span class="unit">m</span></div></div><input class="slider" id="depth" type="range" min="0" max="30" step="0.1" value="10" aria-label="潜水深度（米）"><div class="ticks"><span>液面 0 m</span><span>15 m</span><span>30 m</span></div><div class="presets" role="group" aria-label="快速选择深度"><button data-depth="0">0 m</button><button data-depth="10">10 m</button><button data-depth="20">20 m</button><button data-depth="30">30 m</button></div><div class="actions"><button id="play" aria-pressed="false">↓ 自动下潜</button><button id="surface">↑ 回到液面</button></div></section>
+<section class="card reading"><div class="section-label">测压点 · 液体产生的压强</div><div class="pressure-number"><output id="pressure">100.0</output> <span class="unit">kPa</span></div><div class="formula"><i>p</i> = <i>ρgh</i></div><div class="calc" id="calculation">1000 × 10 × 10.0 = 100 000 Pa</div><div class="meter"><div id="meter"></div></div><p class="mini">取 g = 10 N/kg · 1 kPa = 1000 Pa<br>显示液体压强，不计液面上方的大气压强。</p></section>
+</aside>
+</div>
+<div class="bottom"><section class="card lesson"><div><h2>潜得更深，会怎样？</h2><p>保持液体种类不变，向下拖动。<br><strong>深度越大，液体压强越大。</strong></p></div><div><h2>同一深度，谁挤得更紧？</h2><p>保持深度不变，切换三种液体。<br><strong>密度越大，液体压强越大。</strong></p></div></section><section class="card comparison"><h2>同一深度的压强对比 <span id="compareDepth" style="font-weight:400;color:var(--muted)">/ 10.0 m</span></h2><div id="compareBars"></div></section></div>
+<footer>深度 h 从液面量到玩偶腹部的白点。读数为液体产生的表压，玩偶的形变夸张显示。在同一处，静止液体向各个方向的压强相等。</footer>
+</main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const fluids = {sea:{name:'海水',rho:1030,colors:['#afd9e8','#60a6c6','#356789']},water:{name:'水',rho:1000,colors:['#a9e4df','#63b8c2','#317e98']},alcohol:{name:'酒精',rho:800,colors:['#d4dfea','#9aaccb','#686eaa']}};
+let liquid='water', depth=10, playing=false, previousTime=null, frameId=0;
+const surfaceY=160, depthScale=14, frogScale=.68;
+const pressureAt=(rho,h)=>rho*10*h;
+$('grid').innerHTML=Array.from({length:7},(_,i)=>{const y=surfaceY+i*5*depthScale;return `<line x1="66" y1="${y}" x2="80" y2="${y}" stroke="#ecfff5" stroke-width="2"/><line x1="80" y1="${y}" x2="820" y2="${y}" stroke="#e7fff7" opacity=".13"/><text x="56" y="${y+5}" text-anchor="end" fill="#effff8" font-size="13">${i*5} m</text>`}).join('')+`<line x1="80" y1="160" x2="80" y2="580" stroke="#eafff3" opacity=".6"/>`;
+$('compareBars').innerHTML=Object.entries(fluids).map(([key,f])=>`<div class="bar-row" id="compare-${key}"><span>${f.name}</span><div class="bar-track"><div class="bar" id="bar-${key}"></div></div><output id="value-${key}"></output></div>`).join('');
+function render(){
+ const f=fluids[liquid],pa=pressureAt(f.rho,depth),kpa=pa/1000,t=pa/309000;
+ const squeezeX=1-.48*t,squeezeY=1-.18*t,y=surfaceY+depth*depthScale;
+ $('depth').value=depth.toFixed(1);$('depthValue').textContent=depth.toFixed(1);$('pressure').textContent=kpa.toFixed(1);
+ $('depth').setAttribute('aria-valuetext',`${depth.toFixed(1)} 米`);
+ $('calculation').textContent=`${f.rho} × 10 × ${depth.toFixed(1)} = ${Math.round(pa).toLocaleString('en-US').replaceAll(',',' ')} Pa`;
+ $('meter').style.width=`${t*100}%`;$('liquidLabel').textContent=`${f.name} · ρ = ${f.rho} kg/m³`;
+ ['waterTop','waterMid','waterBottom'].forEach((id,i)=>$(id).setAttribute('stop-color',f.colors[i]));
+ $('sceneTitle').textContent=`潜水蛙在${f.name}中潜水，深度 ${depth.toFixed(1)} 米，压强 ${kpa.toFixed(1)} 千帕`;
+ $('diver').setAttribute('transform',`translate(441 ${y})`);
+ $('squeeze').setAttribute('transform',`scale(${frogScale*squeezeX} ${frogScale*squeezeY})`);
+ $('original').setAttribute('transform',`scale(${frogScale})`);$('original').style.display=$('showOriginal').checked?'':'none';
+ $('pointLine').setAttribute('y1',y);$('pointLine').setAttribute('y2',y);
+ $('depthTag').setAttribute('y',y-16);$('depthTagText').setAttribute('y',y+5);$('depthTagText').textContent=`h = ${depth.toFixed(1)} m`;
+ $('depthLine').setAttribute('d',`M110 ${surfaceY}V${y}`);$('depthCaps').setAttribute('d',`M104 ${surfaceY}H116M104 ${y}H116`);
+ const rx=73*squeezeX,ry=83*squeezeY,len=13+50*t;
+ $('arrows').innerHTML=depth===0?'':Array.from({length:8},(_,i)=>{const a=i*Math.PI/4,dx=Math.cos(a),dy=Math.sin(a),x=dx*rx,ay=dy*ry;return `<path d="M${x+dx*len} ${ay+dy*len}L${x} ${ay}" stroke-width="${1.3+4*t}" opacity="${.45+.55*t}"/>`}).join('');
+ $('status').textContent=depth===0?'液面处的表压为零':t<.25?'轻轻挤，肚子还是圆圆的':t<.6?'有点挤，肚子收起来了':'挤得更紧，潜水蛙变瘦了';
+ $('compareDepth').textContent=`/ ${depth.toFixed(1)} m`;
+ for(const [key,fluid] of Object.entries(fluids)){const value=pressureAt(fluid.rho,depth)/1000;$(`bar-${key}`).style.width=`${value/309*100}%`;$(`value-${key}`).textContent=`${value.toFixed(1)} kPa`;$(`compare-${key}`).classList.toggle('active',key===liquid)}
+ document.querySelectorAll('[data-liquid]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.liquid===liquid)));
+ $('play').textContent=playing?'Ⅱ 暂停下潜':depth>=30?'↻ 重新下潜':'↓ 自动下潜';$('play').setAttribute('aria-pressed',String(playing));
+}
+function setDepth(value){depth=Math.round(Math.max(0,Math.min(30,value))*10)/10;render()}
+function stop(){cancelAnimationFrame(frameId);playing=false;previousTime=null}
+$('depth').addEventListener('input',e=>{stop();setDepth(Number(e.target.value))});
+document.querySelectorAll('[data-liquid]').forEach(b=>b.addEventListener('click',()=>{stop();liquid=b.dataset.liquid;render()}));
+document.querySelectorAll('[data-depth]').forEach(b=>b.addEventListener('click',()=>{stop();setDepth(Number(b.dataset.depth))}));
+$('surface').onclick=()=>{stop();setDepth(0)};
+$('showOriginal').onchange=render;
+$('play').onclick=()=>{if(playing){stop();render();return}if(depth>=30)depth=0;playing=true;previousTime=null;render();frameId=requestAnimationFrame(animate)};
+let animationDepth=depth;
+function animate(time){if(!playing)return;if(previousTime===null){previousTime=time;animationDepth=depth}const dt=Math.min((time-previousTime)/1000,.1);previousTime=time;animationDepth=Math.min(30,animationDepth+dt*2);depth=Math.round(animationDepth*10)/10;if(animationDepth>=30)stop();render();if(playing)frameId=requestAnimationFrame(animate)}
+$('reset').onclick=()=>{stop();liquid='water';$('showOriginal').checked=true;setDepth(10)};
+let dragging=false;
+function pointDepth(e){const p=$('tank').createSVGPoint();p.x=e.clientX;p.y=e.clientY;const local=p.matrixTransform($('tank').getScreenCTM().inverse());setDepth((local.y-surfaceY)/depthScale)}
+$('tank').addEventListener('pointerdown',e=>{if(e.button!==0)return;stop();dragging=true;$('tank').setPointerCapture(e.pointerId);pointDepth(e)});
+$('tank').addEventListener('pointermove',e=>{if(dragging)pointDepth(e)});
+$('tank').addEventListener('pointerup',()=>{dragging=false});$('tank').addEventListener('pointercancel',()=>{dragging=false});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();render()}});
+render();
+</script>
+</body></html>

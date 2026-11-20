@@ -1,0 +1,949 @@
+<!doctype html>
+<!--
+MIT License
+
+Copyright (c) 2026 Yiyan Bai
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="调节天体的位置，看光线投下的影子，也看看地球上的观测者会看到什么。">
+<title>日月食与水星凌日 · 课堂演示</title>
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f7f6ef;
+  --ink: #173c3b;
+  --line: #cbd8ce;
+  --muted-ink: #516a64;
+  --radius-lg: 10px;
+  --viz-series-2: #c96b2e;
+  --viz-series-3: #1b826c;
+  --viz-series-5: #745fc7;
+  --muted-foreground: #748987;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font: 16px/1.55 system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+main { width: min(1080px, 100%); margin: 0 auto; padding: 28px clamp(16px, 4vw, 46px) 48px; }
+.lab-nav a { display: inline-block; padding: 5px 0; color: #386761; font-size: 14px; text-decoration: none; }
+.lab-nav a:hover { text-decoration: underline; }
+header { margin: 32px 0 24px; }
+header small { display: block; color: #52736b; font: 600 12px/1.4 ui-monospace, Menlo, monospace; letter-spacing: .12em; }
+h1 { margin: 6px 0 8px; font: 650 clamp(28px, 4vw, 44px)/1.28 "Songti SC", "Noto Serif CJK SC", serif; }
+header p { color: var(--muted-ink); margin: 0; }
+button, input, select { font: inherit; }
+button, select, input[type=range], input[type=checkbox] { cursor: pointer; }
+button { color: var(--ink); }
+:focus-visible { outline: 3px solid #bb602e; outline-offset: 3px; }
+.btn, .form-select {
+  padding: 8px 13px; min-height: 42px; border: 1px solid var(--line); border-radius: 6px;
+  background: #fffef9; color: var(--ink); line-height: 1.4;
+}
+.btn:hover { border-color: var(--ink); }
+.btn-primary { background: var(--ink); border-color: var(--ink); color: white; }
+.viz-badge {
+  padding: 4px 10px; border-radius: 4px; color: #395d54; background: #e1ebe0;
+  font-size: 12px; font-weight: 650;
+}
+.viz-grid { display: grid; gap: 8px; }
+.card { border: 1px solid var(--line); background: #fffef9; border-radius: 10px; }
+.viz-stat { padding: 10px 14px; }
+.viz-stat-value { line-height: 1.5; font-weight: 600; }
+.text-muted { font-size: 13px; color: var(--muted-ink); }
+.viz-controls, .viz-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.viz-controls { background: #fffef9; border: 1px solid var(--line); padding: 12px; border-radius: 8px; }
+.form-check { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; cursor: pointer; }
+.form-check-input { width: 18px; height: 18px; accent-color: #225b51; }
+.form-range { accent-color: #225b51; margin: 0; min-height: 24px; }
+.form-label, .form-check-label { font-size: 14px; }
+.cll-stage-footer, .asl-stage-footer, .cll-legend { color: var(--muted-ink); font-size: 13px; }
+.cll-footnote, .asl-footnote { font-size: 15px; margin: 6px 0; }
+canvas {
+  --background: #10282e; --foreground: #eff7f0; --muted-foreground: #b3c7c1;
+  --border: #73938d; --popover: #203a40; --popover-foreground: #f7faf3;
+  --secondary-foreground: #d5e2dc; --viz-series-1: #6bb9f0;
+  --viz-series-2: #ffc177; --viz-series-3: #7de5bd; --viz-series-4: #e58896;
+  --viz-series-5: #c3a5ef; --viz-series-6: #78d1d7;
+  height: auto;
+}
+@media(max-width: 560px) {
+  main { padding: 16px 12px 28px; }
+  header { margin: 20px 0; }
+  .viz-stat { padding: 6px 10px; display:flex; gap: 10px; align-items: center; }
+  .viz-stat .text-muted { min-width: 4em; }
+  .viz-stat .viz-stat-value { margin: 0 !important; }
+  .viz-grid { gap: 3px; }
+  .btn { padding: 6px 10px; font-size: 14px; }
+  .viz-controls { gap: 7px 12px; }
+}
+</style>
+</head>
+<body><main>
+<nav class="lab-nav" aria-label="返回主页"><a href="../index.html#labs"><span aria-hidden="true">←</span> 课堂演示</a></nav>
+<header><small>LIGHT & SHADOW</small><h1>日月食与水星凌日</h1><p>调节天体的位置，看光线投下的影子，也看看地球上的观测者会看到什么。</p></header>
+<div id="astro-shadow-lab">
+  <div class="asl-modebar" role="group" aria-label="选择天文现象">
+    <button type="button" class="btn btn-primary asl-mode" data-mode="solar" aria-pressed="true">日食</button>
+    <button type="button" class="btn asl-mode" data-mode="lunar" aria-pressed="false">月食</button>
+    <button type="button" class="btn asl-mode" data-mode="transit" aria-pressed="false">水星凌日</button>
+    <span class="viz-badge asl-live" aria-live="polite">日全食条件</span>
+  </div>
+
+  <div class="viz-grid asl-stats" aria-live="polite">
+    <div class="card viz-stat">
+      <span class="text-muted">天体顺序</span>
+      <span class="viz-stat-value" id="asl-order">太阳 → 月球 → 地球</span>
+    </div>
+    <div class="card viz-stat">
+      <span class="text-muted">当前观测</span>
+      <span class="viz-stat-value" id="asl-result">日全食</span>
+    </div>
+    <div class="card viz-stat">
+      <span class="text-muted">核心原因</span>
+      <span class="viz-stat-value" id="asl-reason">月球本影落到地球</span>
+    </div>
+  </div>
+
+  <div class="card asl-stage">
+    <canvas id="asl-canvas" role="img" aria-label="太阳、月球、地球与光影关系的互动演示"></canvas>
+    <div class="asl-stage-footer">
+      <span id="asl-drag-hint"><span aria-hidden="true">↕</span> 拖动月球改变对齐程度</span>
+      <span class="text-muted" id="asl-scale-note">示意比例 · 阴影范围已放大</span>
+    </div>
+  </div>
+
+  <div class="viz-controls" aria-label="演示控制">
+    <button type="button" class="btn btn-primary" id="asl-play"><span aria-hidden="true">▷</span><span>播放轨道</span></button>
+    <button type="button" class="btn" id="asl-reset"><span aria-hidden="true">↺</span><span>复位</span></button>
+    <label class="form-label asl-range-label" for="asl-progress">
+      <span>轨道位置 <output id="asl-progress-value">50%</output></span>
+      <input class="form-range" id="asl-progress" type="range" min="0" max="100" value="50" step="1">
+    </label>
+    <label class="form-label asl-range-label" for="asl-offset">
+      <span>轨道偏移 <output id="asl-offset-value">0%</output></span>
+      <input class="form-range" id="asl-offset" type="range" min="-100" max="100" value="0" step="1">
+    </label>
+  </div>
+
+  <div class="viz-controls asl-toggles" aria-label="图层控制">
+    <label class="form-check form-switch">
+      <input class="form-check-input" id="asl-rays" type="checkbox" checked>
+      <span class="form-check-label">显示光路</span>
+    </label>
+    <label class="form-check form-switch">
+      <input class="form-check-input" id="asl-labels" type="checkbox" checked>
+      <span class="form-check-label">显示标注</span>
+    </label>
+    <label class="form-check form-switch">
+      <input class="form-check-input" id="asl-scale" type="checkbox">
+      <span class="form-check-label">直径近似真实比例</span>
+    </label>
+    <label class="form-label asl-speed-label" for="asl-speed">
+      <span>速度</span>
+      <select class="form-select" id="asl-speed">
+        <option value="0.5">0.5×</option>
+        <option value="1" selected>1×</option>
+        <option value="2">2×</option>
+      </select>
+    </label>
+  </div>
+
+  <p class="text-small text-muted asl-footnote" id="asl-footnote">只有月球进入太阳与地球之间，并且三者近似共线时，地球上才可能看见日食。</p>
+</div>
+
+<style>
+  #astro-shadow-lab {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  #astro-shadow-lab .asl-modebar,
+  #astro-shadow-lab .asl-stage-footer,
+  #astro-shadow-lab .asl-range-label > span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #astro-shadow-lab .asl-modebar { flex-wrap: wrap; }
+  #astro-shadow-lab .asl-live { margin-inline-start: auto; }
+  #astro-shadow-lab .asl-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #astro-shadow-lab .asl-stats .viz-stat-value {
+    display: block;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+  }
+  #astro-shadow-lab .asl-stage { padding: 8px; }
+  #astro-shadow-lab #asl-canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    border-radius: var(--radius-lg);
+    background: var(--background);
+    touch-action: none;
+    cursor: grab;
+    color-scheme: dark;
+  }
+  #astro-shadow-lab #asl-canvas:active { cursor: grabbing; }
+  #astro-shadow-lab .asl-stage-footer {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 8px 4px 0;
+  }
+  #astro-shadow-lab .asl-stage-footer span { display: inline-flex; align-items: center; gap: 6px; }
+  #astro-shadow-lab .asl-range-label {
+    flex: 1 1 180px;
+    min-width: 150px;
+  }
+  #astro-shadow-lab .asl-range-label > span { justify-content: space-between; }
+  #astro-shadow-lab .asl-range-label input { width: 100%; }
+  #astro-shadow-lab .asl-speed-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-inline-start: auto;
+    flex: 1 1 150px;
+  }
+  #astro-shadow-lab .asl-speed-label > span { white-space: nowrap; }
+  #astro-shadow-lab .asl-speed-label .form-select { flex: 1; min-width: 90px; }
+  #astro-shadow-lab .asl-footnote { text-align: center; }
+  @media (max-width: 560px) {
+    #astro-shadow-lab .asl-stats { grid-template-columns: 1fr; }
+    #astro-shadow-lab .asl-live { width: 100%; margin-inline-start: 0; }
+    #astro-shadow-lab #asl-canvas { aspect-ratio: 4 / 3; }
+    #astro-shadow-lab .asl-speed-label { margin-inline-start: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #astro-shadow-lab * { scroll-behavior: auto !important; }
+  }
+</style>
+
+<script>
+(() => {
+  const root = document.getElementById('astro-shadow-lab');
+  if (!root) return;
+
+  const canvas = root.querySelector('#asl-canvas');
+  const ctx = canvas.getContext('2d');
+  const controls = {
+    modes: [...root.querySelectorAll('.asl-mode')],
+    play: root.querySelector('#asl-play'),
+    reset: root.querySelector('#asl-reset'),
+    progress: root.querySelector('#asl-progress'),
+    progressValue: root.querySelector('#asl-progress-value'),
+    offset: root.querySelector('#asl-offset'),
+    offsetValue: root.querySelector('#asl-offset-value'),
+    rays: root.querySelector('#asl-rays'),
+    labels: root.querySelector('#asl-labels'),
+    scale: root.querySelector('#asl-scale'),
+    speed: root.querySelector('#asl-speed')
+  };
+  const text = {
+    order: root.querySelector('#asl-order'),
+    result: root.querySelector('#asl-result'),
+    reason: root.querySelector('#asl-reason'),
+    live: root.querySelector('.asl-live'),
+    hint: root.querySelector('#asl-drag-hint'),
+    scaleNote: root.querySelector('#asl-scale-note'),
+    footnote: root.querySelector('#asl-footnote')
+  };
+
+  const state = {
+    mode: 'solar',
+    progress: 0.5,
+    offset: 0,
+    playing: false,
+    dragging: false,
+    justReset: true,
+    activeOrbitBaseY: 0,
+    lastTime: 0,
+    stars: Array.from({ length: 86 }, (_, i) => ({
+      x: ((Math.sin(i * 12.9898) * 43758.5453) % 1 + 1) % 1,
+      y: ((Math.sin(i * 78.233 + 2) * 23421.631) % 1 + 1) % 1,
+      r: 0.35 + (i % 5) * 0.18,
+      a: 0.18 + (i % 7) * 0.07
+    }))
+  };
+
+  const modeCopy = {
+    solar: {
+      order: '太阳 → 月球 → 地球',
+      hint: '拖动月球改变轨道偏移',
+      foot: '只有月球进入太阳与地球之间，并且三者近似共线时，地球上才可能看见日食。'
+    },
+    lunar: {
+      order: '太阳 → 地球 → 月球',
+      hint: '拖动月球改变轨道偏移',
+      foot: '月球进入地球背向太阳的一侧，穿过半影或本影。留意月面从边缘开始的明暗变化。'
+    },
+    transit: {
+      order: '太阳 → 水星 → 地球',
+      hint: '拖动水星改变轨道偏移',
+      foot: '当地球、水星和太阳近似共线，水星从太阳圆面前经过，地球上的观测者会看到一个小黑点。'
+    }
+  };
+
+  const resolvedColorCache = new Map();
+  const alphaColorCache = new Map();
+
+  function css(name) {
+    const key = `${name}:${document.documentElement.getAttribute('data-theme') || 'auto'}`;
+    if (resolvedColorCache.has(key)) return resolvedColorCache.get(key);
+    const probe = document.createElement('span');
+    probe.style.color = `var(${name})`;
+    probe.style.display = 'none';
+    canvas.appendChild(probe);
+    const value = getComputedStyle(probe).color;
+    probe.remove();
+    resolvedColorCache.set(key, value);
+    return value;
+  }
+
+  function palette() {
+    return {
+      bg: css('--background'),
+      fg: css('--foreground'),
+      muted: css('--muted-foreground'),
+      border: css('--border'),
+      sun: css('--viz-series-2'),
+      earth: css('--viz-series-1'),
+      life: css('--viz-series-3'),
+      moon: css('--secondary-foreground'),
+      mercury: css('--viz-series-4'),
+      shadow: css('--viz-series-5'),
+      penumbra: css('--viz-series-6'),
+      panel: css('--popover'),
+      panelFg: css('--popover-foreground')
+    };
+  }
+
+  function rgba(color, alpha) {
+    const key = `${color}:${alpha}`;
+    if (alphaColorCache.has(key)) return alphaColorCache.get(key);
+    const nums = color.match(/[\d.]+/g);
+    const value = nums && nums.length >= 3 ? `rgba(${nums[0]}, ${nums[1]}, ${nums[2]}, ${alpha})` : color;
+    alphaColorCache.set(key, value);
+    return value;
+  }
+
+  const viewport = { width: 0, height: 0, dpr: 1 };
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = Math.max(1, Math.round(rect.width));
+    const height = Math.max(1, Math.round(rect.height));
+    const pixelWidth = Math.round(width * dpr);
+    const pixelHeight = Math.round(height * dpr);
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    viewport.width = width;
+    viewport.height = height;
+    viewport.dpr = dpr;
+    draw(width, height);
+  }
+
+  function redraw() {
+    if (!viewport.width || !viewport.height) {
+      resize();
+      return;
+    }
+    draw(viewport.width, viewport.height);
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, r);
+  }
+
+  function fillCircle(x, y, r, fill, glow = 0) {
+    ctx.save();
+    ctx.fillStyle = fill;
+    if (glow) {
+      ctx.shadowColor = fill;
+      ctx.shadowBlur = glow;
+    }
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawLabel(label, x, y, p, anchor = 'center') {
+    if (!controls.labels.checked) return;
+    ctx.save();
+    ctx.font = '500 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.textAlign = anchor;
+    ctx.textBaseline = 'middle';
+    const metrics = ctx.measureText(label);
+    const pad = 7;
+    const bx = anchor === 'center' ? x - metrics.width / 2 - pad : anchor === 'left' ? x - pad : x - metrics.width - pad;
+    roundRect(bx, y - 12, metrics.width + pad * 2, 24, 8);
+    ctx.fillStyle = rgba(p.panel, 0.88);
+    ctx.fill();
+    ctx.fillStyle = p.panelFg;
+    ctx.fillText(label, x, y);
+    ctx.restore();
+  }
+
+  function drawArrow(x1, y1, x2, y2, color, alpha = 0.55) {
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    ctx.save();
+    ctx.strokeStyle = rgba(color, alpha);
+    ctx.fillStyle = rgba(color, alpha);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - 7 * Math.cos(angle - 0.42), y2 - 7 * Math.sin(angle - 0.42));
+    ctx.lineTo(x2 - 7 * Math.cos(angle + 0.42), y2 - 7 * Math.sin(angle + 0.42));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function classify(alignment) {
+    const a = Math.abs(alignment);
+    if (state.mode === 'solar') {
+      if (a < 0.13) return { result: '日全食', reason: '月球本影落到地球', badge: '日全食条件', depth: 1 };
+      if (a < 0.43) return { result: '日偏食', reason: '地球只进入月球半影', badge: '日偏食条件', depth: 0.62 };
+      return { result: '无日食', reason: '三者没有近似共线', badge: '影子掠过地球', depth: 0.08 };
+    }
+    if (state.mode === 'lunar') {
+      if (a < 0.14) return { result: '月全食', reason: '月球全部进入地球本影', badge: '月全食 · 红月亮', depth: 1 };
+      if (a < 0.34) return { result: '月偏食', reason: '月球部分进入地球本影', badge: '月偏食条件', depth: 0.66 };
+      if (a < 0.62) return { result: '半影月食', reason: '月球只进入地球半影', badge: '半影月食条件', depth: 0.3 };
+      return { result: '无月食', reason: '月球绕过地球影区', badge: '没有进入影区', depth: 0.05 };
+    }
+    if (a < 0.42) return { result: '水星凌日', reason: '水星投影进入太阳圆面', badge: '凌日进行中', depth: 1 };
+    return { result: '未发生凌日', reason: '水星从太阳圆面旁掠过', badge: '轨道不共面', depth: 0.06 };
+  }
+
+  function bodySizes(h) {
+    const realistic = controls.scale.checked;
+    if (realistic) {
+      const earth = h * 0.42 / 109;
+      return {
+        sun: earth * 109,
+        earth,
+        moon: earth * 0.273,
+        mercury: earth * 0.383
+      };
+    }
+    return {
+      sun: h * 0.105,
+      earth: h * 0.052,
+      moon: h * 0.029,
+      mercury: h * 0.018
+    };
+  }
+
+  function drawBackground(w, h, p) {
+    ctx.fillStyle = p.bg;
+    ctx.fillRect(0, 0, w, h);
+    const glowX = controls.scale.checked ? 0 : w * 0.17;
+    const glow = ctx.createRadialGradient(glowX, h * 0.5, 0, glowX, h * 0.5, w * 0.62);
+    glow.addColorStop(0, rgba(p.sun, 0.13));
+    glow.addColorStop(0.45, rgba(p.shadow, 0.045));
+    glow.addColorStop(1, rgba(p.bg, 0));
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, w, h);
+    state.stars.forEach(s => {
+      ctx.globalAlpha = s.a;
+      fillCircle(s.x * w, s.y * h, s.r, p.fg);
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function drawSun(x, y, r, p) {
+    const g = ctx.createRadialGradient(x - r * 0.25, y - r * 0.25, r * 0.08, x, y, r);
+    g.addColorStop(0, p.fg);
+    g.addColorStop(0.18, p.sun);
+    g.addColorStop(1, rgba(p.sun, 0.72));
+    fillCircle(x, y, r, g, r * 0.5);
+    ctx.save();
+    ctx.strokeStyle = rgba(p.sun, 0.22);
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 12; i++) {
+      const a = i * Math.PI / 6;
+      ctx.beginPath();
+      ctx.moveTo(x + Math.cos(a) * r * 1.12, y + Math.sin(a) * r * 1.12);
+      ctx.lineTo(x + Math.cos(a) * r * 1.38, y + Math.sin(a) * r * 1.38);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawEarth(x, y, r, p) {
+    const g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.3, r * 0.1, x, y, r);
+    g.addColorStop(0, p.life);
+    g.addColorStop(0.38, p.earth);
+    g.addColorStop(1, rgba(p.earth, 0.52));
+    fillCircle(x, y, r, g, r * 0.45);
+    ctx.save();
+    ctx.strokeStyle = rgba(p.life, 0.72);
+    ctx.lineWidth = Math.max(1, r * 0.08);
+    ctx.beginPath();
+    ctx.arc(x - r * 0.12, y - r * 0.08, r * 0.55, -1.1, 0.65);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawRock(x, y, r, p, mercury = false) {
+    const color = mercury ? p.mercury : p.moon;
+    const g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
+    g.addColorStop(0, color);
+    g.addColorStop(1, rgba(color, 0.42));
+    fillCircle(x, y, r, g, r * 0.25);
+    if (r > 7) {
+      fillCircle(x - r * 0.25, y + r * 0.12, r * 0.16, rgba(p.bg, 0.28));
+      fillCircle(x + r * 0.18, y - r * 0.22, r * 0.11, rgba(p.bg, 0.24));
+    }
+  }
+
+  function rayGeometry(source, blocker) {
+    const dx = blocker.x - source.x;
+    const dy = blocker.y - source.y;
+    const distance = Math.max(1, Math.hypot(dx, dy));
+    const ux = dx / distance;
+    const uy = dy / distance;
+    return { distance, ux, uy, nx: -uy, ny: ux };
+  }
+
+  function rayAlignment(source, blocker, target, scale) {
+    const g = rayGeometry(source, blocker);
+    const vx = target.x - blocker.x;
+    const vy = target.y - blocker.y;
+    const along = vx * g.ux + vy * g.uy;
+    const across = vx * g.nx + vy * g.ny;
+    if (along <= 0) return (across < 0 ? -1 : 1) * 2;
+    return across / Math.max(1, scale);
+  }
+
+  function drawCone(source, blocker, length, p, lunar = false) {
+    if (!controls.rays.checked) return;
+    const g = rayGeometry(source, blocker);
+    const spread = length * (source.r / g.distance);
+    const umbraHalf = Math.max(1.5, blocker.r - Math.min(blocker.r * 0.86, spread * (lunar ? 0.09 : 0.07)));
+    const penHalf = blocker.r + spread * (lunar ? 0.2 : 0.16);
+    const top = { x: blocker.x - g.nx * blocker.r, y: blocker.y - g.ny * blocker.r };
+    const bottom = { x: blocker.x + g.nx * blocker.r, y: blocker.y + g.ny * blocker.r };
+    const far = { x: blocker.x + g.ux * length, y: blocker.y + g.uy * length };
+    const farPenTop = { x: far.x - g.nx * penHalf, y: far.y - g.ny * penHalf };
+    const farPenBottom = { x: far.x + g.nx * penHalf, y: far.y + g.ny * penHalf };
+    const farUmbraTop = { x: far.x - g.nx * umbraHalf, y: far.y - g.ny * umbraHalf };
+    const farUmbraBottom = { x: far.x + g.nx * umbraHalf, y: far.y + g.ny * umbraHalf };
+
+    ctx.save();
+    ctx.fillStyle = rgba(p.penumbra, 0.1);
+    ctx.beginPath();
+    ctx.moveTo(top.x, top.y);
+    ctx.lineTo(farPenTop.x, farPenTop.y);
+    ctx.lineTo(farPenBottom.x, farPenBottom.y);
+    ctx.lineTo(bottom.x, bottom.y);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = rgba(p.shadow, 0.24);
+    ctx.beginPath();
+    ctx.moveTo(blocker.x - g.nx * blocker.r * 0.9, blocker.y - g.ny * blocker.r * 0.9);
+    ctx.lineTo(farUmbraTop.x, farUmbraTop.y);
+    ctx.lineTo(farUmbraBottom.x, farUmbraBottom.y);
+    ctx.lineTo(blocker.x + g.nx * blocker.r * 0.9, blocker.y + g.ny * blocker.r * 0.9);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = rgba(p.penumbra, 0.52);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(top.x, top.y);
+    ctx.lineTo(farPenTop.x, farPenTop.y);
+    ctx.moveTo(bottom.x, bottom.y);
+    ctx.lineTo(farPenBottom.x, farPenBottom.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = rgba(p.shadow, 0.68);
+    ctx.beginPath();
+    ctx.moveTo(blocker.x - g.nx * blocker.r * 0.9, blocker.y - g.ny * blocker.r * 0.9);
+    ctx.lineTo(farUmbraTop.x, farUmbraTop.y);
+    ctx.moveTo(blocker.x + g.nx * blocker.r * 0.9, blocker.y + g.ny * blocker.r * 0.9);
+    ctx.lineTo(farUmbraBottom.x, farUmbraBottom.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawSightLines(sun, middle, earth, p) {
+    if (!controls.rays.checked) return;
+    const bands = [-0.7, -0.35, 0, 0.35, 0.7];
+    bands.forEach((b, i) => {
+      const y1 = sun.y + b * sun.r;
+      const y2 = middle.y + b * middle.r * 0.75;
+      drawArrow(sun.x + sun.r * 0.82, y1, earth.x - earth.r * 1.1, y2 + (earth.y - middle.y) * 0.15, p.sun, i === 2 ? 0.7 : 0.28);
+    });
+  }
+
+  function drawOrbit(cx, cy, rx, ry, p) {
+    if (!controls.labels.checked) return;
+    ctx.save();
+    ctx.setLineDash([3, 8]);
+    ctx.strokeStyle = rgba(p.muted, 0.28);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, Math.max(8, rx), Math.max(5, ry), 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawObserverInset(x, y, r, result, p, alignment) {
+    ctx.save();
+    ctx.fillStyle = rgba(p.panel, 0.9);
+    roundRect(x - r - 17, y - r - 30, r * 2 + 34, r * 2 + 55, 14);
+    ctx.fill();
+    ctx.strokeStyle = rgba(p.border, 0.9);
+    ctx.stroke();
+    ctx.font = '500 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.fillStyle = p.panelFg;
+    ctx.textAlign = 'center';
+    ctx.fillText('观测者视野', x, y - r - 14);
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.fillStyle = p.bg;
+    ctx.fillRect(x - r, y - r, r * 2, r * 2);
+    const o = alignment;
+    if (state.mode === 'solar') {
+      const apparentOffset = result.result === '日全食' ? 0 : result.result === '无日食' ? 1.35 : Math.sign(o) * (Math.abs(o) - 0.13) / 0.3 * 0.83;
+      fillCircle(x, y, r * 0.72, p.sun, r * 0.22);
+      fillCircle(x + apparentOffset * r * 1.65, y + apparentOffset * r * 0.35, r * 0.72, p.bg);
+      if (result.result === '日全食') {
+        ctx.strokeStyle = rgba(p.sun, 0.85);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, y, r * 0.78, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    } else if (state.mode === 'lunar') {
+      const moonR = r * 0.66;
+      const shadowR = r * 0.84;
+      const shadowY = y + (result.result === '月全食' ? o : result.result === '月偏食' ? Math.sign(o) * (0.18 + 1.30 * (Math.abs(o) - 0.14) / 0.2) : 2) * r;
+      const umbraStrength = Math.max(0, Math.min(1, 1 - Math.abs(o) / 0.62));
+      fillCircle(x, y, moonR, p.moon, r * 0.12);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, moonR, 0, Math.PI * 2);
+      ctx.clip();
+      if (result.result === '半影月食') {
+        ctx.fillStyle = rgba(p.shadow, 0.18);
+        ctx.fillRect(x - moonR, y - moonR, 2 * moonR, 2 * moonR);
+      }
+      ctx.fillStyle = rgba(p.shadow, 0.32 + umbraStrength * 0.38);
+      ctx.beginPath();
+      ctx.arc(x, shadowY, shadowR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = rgba(p.sun, umbraStrength * 0.52);
+      ctx.beginPath();
+      ctx.arc(x, shadowY, shadowR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    } else {
+      fillCircle(x, y, r * 0.72, p.sun, r * 0.2);
+      const mx = result.result === '未发生凌日' ? x + r * 1.2 : x + o * r * 1.5;
+      const my = y + state.offset * r * 0.55;
+      fillCircle(mx, my, Math.max(2.2, r * (controls.scale.checked ? 0.035 : 0.085)), '#332b29');
+    }
+    ctx.restore();
+  }
+
+  function drawAlignmentAxis(source, target, w, h, p) {
+    if (!controls.labels.checked) return;
+    const g = rayGeometry(source, target);
+    ctx.save();
+    ctx.setLineDash([3, 6]);
+    ctx.strokeStyle = rgba(p.muted, 0.5);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(source.x - g.ux * w * 0.03, source.y - g.uy * w * 0.03);
+    ctx.lineTo(target.x + g.ux * w * 0.12, target.y + g.uy * w * 0.12);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = '400 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.fillStyle = p.muted;
+    ctx.textAlign = 'left';
+    if (w > 500) ctx.fillText('太阳—遮光天体连线', Math.max(12, source.x + g.ux * w * 0.08), source.y + g.uy * w * 0.08 - 9);
+    ctx.restore();
+  }
+
+  function draw(w, h) {
+    const p = palette();
+    const size = bodySizes(h);
+    const y0 = h * 0.52;
+    drawBackground(w, h, p);
+
+    const realistic = controls.scale.checked;
+    const layout = realistic
+      ? { sunX: -w * 0.018, middleX: w * 0.58, earthX: w * 0.9, lunarEarthX: w * 0.58, moonX: w * 0.9 }
+      : { sunX: w * 0.14, middleX: w * 0.46, earthX: w * 0.78, lunarEarthX: w * 0.44, moonX: w * 0.76 };
+    const sun = { x: layout.sunX, y: y0, r: size.sun };
+    const insetR = Math.min(h * 0.105, 47);
+    const inset = { x: w - insetR - 25, y: insetR + 32, r: insetR };
+    const coneLength = Math.hypot(w, h) * 0.88;
+    const monthlyAngle = (state.progress - 0.5) * 0.46;
+    let result;
+
+    if (state.mode === 'solar') {
+      const earthDistance = layout.earthX - sun.x;
+      const earth = {
+        x: sun.x + earthDistance * Math.cos(monthlyAngle),
+        y: y0 + h * 0.9 * Math.sin(monthlyAngle),
+        r: size.earth
+      };
+      const orbitRx = w * (realistic ? 0.21 : 0.2);
+      const orbitRy = h * 0.17;
+      const theta = Math.PI + (state.progress - 0.5) * Math.PI * 2;
+      const orbitBaseY = earth.y + orbitRy * Math.sin(theta);
+      const moon = {
+        x: earth.x + orbitRx * Math.cos(theta),
+        y: orbitBaseY + state.offset * h * 0.12,
+        r: size.moon
+      };
+      state.activeOrbitBaseY = orbitBaseY;
+      const alignment = rayAlignment(sun, moon, earth, h * 0.12);
+      result = classify(alignment);
+      drawAlignmentAxis(sun, moon, w, h, p);
+      drawOrbit(earth.x, earth.y, orbitRx, orbitRy, p);
+      drawCone(sun, moon, coneLength, p, false);
+      drawSun(sun.x, sun.y, sun.r, p);
+      drawRock(moon.x, moon.y, moon.r, p);
+      drawEarth(earth.x, earth.y, earth.r, p);
+      drawSightLines(sun, moon, earth, p);
+      drawLabel(realistic ? '太阳 · 直径≈地球109倍' : '太阳 · 光源', Math.max(sun.x, sun.r * 0.52), sun.y + sun.r + 24, p);
+      drawLabel('月球', moon.x, moon.y + moon.r + 22, p);
+      drawLabel('地球', earth.x, earth.y + earth.r + 22, p);
+      if (w > 500 && controls.labels.checked && controls.rays.checked) {
+        const g = rayGeometry(sun, moon);
+        drawLabel('本影', moon.x + g.ux * w * 0.16, moon.y + g.uy * w * 0.16, p);
+        drawLabel('半影', moon.x + g.ux * w * 0.13 - g.nx * h * 0.1, moon.y + g.uy * w * 0.13 - g.ny * h * 0.1, p);
+      }
+      drawObserverInset(inset.x, inset.y, inset.r, result, p, alignment);
+    } else if (state.mode === 'lunar') {
+      const earthDistance = layout.lunarEarthX - sun.x;
+      const middleEarth = {
+        x: sun.x + earthDistance * Math.cos(monthlyAngle),
+        y: y0 + h * 0.9 * Math.sin(monthlyAngle),
+        r: size.earth
+      };
+      const orbitRx = w * (realistic ? 0.21 : 0.2);
+      const orbitRy = h * 0.17;
+      const theta = (state.progress - 0.5) * Math.PI * 2;
+      const orbitBaseY = middleEarth.y + orbitRy * Math.sin(theta);
+      const moon = {
+        x: middleEarth.x + orbitRx * Math.cos(theta),
+        y: orbitBaseY + state.offset * h * 0.12,
+        r: size.moon
+      };
+      state.activeOrbitBaseY = orbitBaseY;
+      const alignment = rayAlignment(sun, middleEarth, moon, h * 0.12);
+      result = classify(alignment);
+      drawAlignmentAxis(sun, middleEarth, w, h, p);
+      drawOrbit(middleEarth.x, middleEarth.y, orbitRx, orbitRy, p);
+      drawCone(sun, middleEarth, coneLength, p, true);
+      drawSun(sun.x, sun.y, sun.r, p);
+      drawEarth(middleEarth.x, middleEarth.y, middleEarth.r, p);
+      drawRock(moon.x, moon.y, moon.r, p);
+      drawLabel(realistic ? '太阳 · 直径≈地球109倍' : '太阳 · 光源', Math.max(sun.x, sun.r * 0.52), sun.y + sun.r + 24, p);
+      drawLabel('地球', middleEarth.x, middleEarth.y + middleEarth.r + 22, p);
+      drawLabel('月球', moon.x, moon.y + moon.r + 22, p);
+      if (w > 500 && controls.labels.checked && controls.rays.checked) {
+        const g = rayGeometry(sun, middleEarth);
+        drawLabel('地球本影', middleEarth.x + g.ux * w * 0.16, middleEarth.y + g.uy * w * 0.16, p);
+        drawLabel('地球半影', middleEarth.x + g.ux * w * 0.14 - g.nx * h * 0.11, middleEarth.y + g.uy * w * 0.14 - g.ny * h * 0.11, p);
+      }
+      drawObserverInset(inset.x, inset.y, inset.r, result, p, alignment);
+    } else {
+      const earth = { x: layout.earthX, y: y0, r: size.earth };
+      const orbitRx = w * (realistic ? 0.4 : 0.28);
+      const orbitRy = h * 0.25;
+      const theta = (state.progress - 0.5) * Math.PI * 2;
+      const orbitBaseY = sun.y + orbitRy * Math.sin(theta);
+      const mercury = {
+        x: sun.x + orbitRx * Math.cos(theta),
+        y: orbitBaseY + state.offset * h * 0.12,
+        r: size.mercury
+      };
+      state.activeOrbitBaseY = orbitBaseY;
+      const alignment = rayAlignment(sun, mercury, earth, h * 0.12);
+      result = classify(alignment);
+      drawAlignmentAxis(sun, mercury, w, h, p);
+      drawOrbit(sun.x, sun.y, orbitRx, orbitRy, p);
+      drawCone(sun, mercury, coneLength, p, false);
+      drawSun(sun.x, sun.y, sun.r, p);
+      drawRock(mercury.x, mercury.y, mercury.r, p, true);
+      drawEarth(earth.x, earth.y, earth.r, p);
+      drawSightLines(sun, mercury, earth, p);
+      drawLabel(realistic ? '太阳 · 直径≈地球109倍' : '太阳', Math.max(sun.x, sun.r * 0.52), sun.y + sun.r + 24, p);
+      drawLabel('水星', mercury.x, mercury.y + mercury.r + 22, p);
+      drawLabel('地球', earth.x, earth.y + earth.r + 22, p);
+      drawObserverInset(inset.x, inset.y, inset.r, result, p, alignment);
+    }
+
+    updateText(result);
+  }
+
+  function updateText(result) {
+    const copy = modeCopy[state.mode];
+    text.order.textContent = copy.order;
+    text.result.textContent = result.result;
+    text.reason.textContent = result.reason;
+    text.live.textContent = result.badge;
+    if (text.hint.lastChild) text.hint.lastChild.textContent = ` ${copy.hint}`;
+    text.footnote.textContent = copy.foot;
+    text.scaleNote.textContent = controls.scale.checked ? '直径按真实比例强调 · 天体距离仍压缩显示' : '示意比例 · 阴影范围已放大';
+    controls.progressValue.value = `${Math.round(state.progress * 100)}%`;
+    controls.progressValue.textContent = `${Math.round(state.progress * 100)}%`;
+    const offsetPercent = Math.round(state.offset * 100);
+    controls.offsetValue.value = `${offsetPercent > 0 ? '+' : ''}${offsetPercent}%`;
+    controls.offsetValue.textContent = `${offsetPercent > 0 ? '+' : ''}${offsetPercent}%`;
+  }
+
+  function syncControls() {
+    controls.progress.value = String(Math.round(state.progress * 100));
+    controls.offset.value = String(Math.round(state.offset * 100));
+  }
+
+  function setPlaying(value) {
+    cancelAnimationFrame(state.frame);
+    state.playing = value;
+    if (value) state.frame = requestAnimationFrame(animate);
+    controls.play.setAttribute('aria-pressed', String(value));
+    controls.play.classList.toggle('btn-primary', !value);
+    controls.play.innerHTML = value
+      ? '<span aria-hidden="true">Ⅱ</span><span>暂停</span>'
+      : '<span aria-hidden="true">▷</span><span>播放轨道</span>';
+  }
+
+  function reset() {
+    state.progress = 0.5;
+    state.offset = 0;
+    state.justReset = true;
+    state.lastTime = 0;
+    setPlaying(false);
+    syncControls();
+    redraw();
+  }
+
+  function animate(time) {
+    if (state.playing) {
+      if (!state.lastTime) state.lastTime = time;
+      const dt = Math.min(40, time - state.lastTime);
+      state.lastTime = time;
+      state.progress += dt * 0.000095 * Number(controls.speed.value);
+      if (state.progress >= 1) {
+        state.progress = 1;
+        setPlaying(false);
+      }
+      syncControls();
+      redraw();
+    }
+    if (state.playing) state.frame = requestAnimationFrame(animate);
+  }
+
+  controls.modes.forEach(button => {
+    button.addEventListener('click', () => {
+      state.mode = button.dataset.mode;
+      controls.modes.forEach(item => {
+        const selected = item === button;
+        item.classList.toggle('btn-primary', selected);
+        item.setAttribute('aria-pressed', String(selected));
+      });
+      reset();
+    });
+  });
+
+  controls.play.addEventListener('click', () => {
+    if (!state.playing && (state.progress >= 0.999 || state.justReset)) state.progress = 0;
+    state.justReset = false;
+    state.lastTime = 0;
+    setPlaying(!state.playing);
+    syncControls();
+    redraw();
+  });
+  controls.reset.addEventListener('click', reset);
+  controls.progress.addEventListener('input', event => {
+    state.progress = Number(event.target.value) / 100;
+    state.justReset = false;
+    setPlaying(false);
+    syncControls();
+    redraw();
+  });
+  controls.offset.addEventListener('input', event => {
+    state.offset = Number(event.target.value) / 100;
+    state.justReset = false;
+    syncControls();
+    redraw();
+  });
+  [controls.rays, controls.labels, controls.scale].forEach(input => input.addEventListener('change', redraw));
+
+  function pointerToOffset(event) {
+    const rect = canvas.getBoundingClientRect();
+    const y = event.clientY - rect.top;
+    state.offset = Math.max(-1, Math.min(1, (y - state.activeOrbitBaseY) / (rect.height * 0.12)));
+    state.justReset = false;
+    syncControls();
+    redraw();
+  }
+  canvas.addEventListener('pointerdown', event => {
+    state.dragging = true;
+    canvas.setPointerCapture(event.pointerId);
+    setPlaying(false);
+    pointerToOffset(event);
+  });
+  canvas.addEventListener('pointermove', event => {
+    if (state.dragging) pointerToOffset(event);
+  });
+  canvas.addEventListener('pointerup', event => {
+    state.dragging = false;
+    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+  });
+  canvas.addEventListener('pointercancel', () => { state.dragging = false; });
+
+  const observer = new ResizeObserver(resize);
+  observer.observe(canvas);
+  window.addEventListener('resize', resize);
+  requestAnimationFrame(resize);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) setPlaying(false);
+  });
+})();
+</script>
+</main></body></html>

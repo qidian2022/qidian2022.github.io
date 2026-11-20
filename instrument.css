@@ -1,0 +1,221 @@
+pendulum-bench {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+  color-scheme: dark;
+  color: #e6f1ec;
+}
+
+pendulum-bench .pb-box {
+  overflow: hidden;
+  background: #101f33;
+  border: 1px solid #394c5b;
+  border-radius: .75rem;
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: normal;
+  text-align: left;
+}
+
+pendulum-bench .pb-heading,
+pendulum-bench .pb-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: .85rem 1.25rem;
+}
+
+pendulum-bench .pb-heading strong {
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: .06em;
+}
+
+pendulum-bench .pb-heading > span,
+pendulum-bench .pb-meter > span,
+pendulum-bench .pb-caption,
+pendulum-bench .pb-length-label {
+  color: #b6c7c8;
+  font-size: .875rem;
+}
+
+pendulum-bench .pb-display {
+  display: grid;
+  grid-template-columns: 1.12fr 1fr;
+  align-items: center;
+  padding: .35rem 1.25rem .4rem .6rem;
+  border-block: 1px solid #334653;
+  background-color: #132437;
+  background-image:
+    linear-gradient(90deg, rgb(165 207 196 / 6%) 1px, transparent 1px),
+    linear-gradient(rgb(165 207 196 / 6%) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+pendulum-bench canvas {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+pendulum-bench .pb-apparatus {
+  height: 9rem;
+}
+
+pendulum-bench .pb-meter {
+  padding: .25rem 0 .25rem .8rem;
+  min-width: 0;
+  border-left: 1px solid #3d505c;
+}
+
+pendulum-bench .pb-value {
+  line-height: 1.1;
+  font-family: Georgia, "Times New Roman", serif;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: #e9f4ec;
+}
+
+pendulum-bench .pb-period {
+  font: inherit;
+  font-size: clamp(2rem, 9cqi, 3rem);
+  letter-spacing: -.055em;
+}
+
+pendulum-bench .pb-value > span {
+  color: #9bd8c7;
+  font-size: 1.125rem;
+  font-style: italic;
+}
+
+pendulum-bench .pb-trace {
+  height: 2.5rem;
+  margin: .35rem 0 .1rem;
+}
+
+pendulum-bench .pb-caption {
+  display: block;
+}
+
+pendulum-bench .pb-setting {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+pendulum-bench .pb-length-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+pendulum-bench .pb-length {
+  color: #d6e6df;
+  font: .875rem ui-monospace, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+pendulum-bench input[type="range"] {
+  display: block;
+  appearance: none;
+  width: 100%;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+pendulum-bench input[type="range"]::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #9bd8c7 var(--pb-filled), #526572 var(--pb-filled));
+}
+
+pendulum-bench input[type="range"]::-moz-range-track {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #9bd8c7 var(--pb-filled), #526572 var(--pb-filled));
+}
+
+pendulum-bench input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  margin-top: -6px;
+  border: 3px solid #9bd8c7;
+  border-radius: 50%;
+  background: #182b39;
+}
+
+pendulum-bench input[type="range"]::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: 3px solid #9bd8c7;
+  border-radius: 50%;
+  background: #182b39;
+}
+
+pendulum-bench .pb-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  min-height: 44px;
+  padding: .55rem .9rem;
+  border: 1px solid #6c8b88;
+  border-radius: .35rem;
+  background: transparent;
+  color: #d3eee2;
+  font: inherit;
+  font-size: .875rem;
+  cursor: pointer;
+}
+
+pendulum-bench .pb-toggle:hover {
+  background: #203a45;
+  border-color: #b2decf;
+}
+
+pendulum-bench :is(input, button):focus-visible {
+  outline: 2px solid #ffaf7a;
+  outline-offset: 3px;
+}
+
+pendulum-bench .pb-toggle i {
+  display: block;
+  box-sizing: content-box;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-width: 5px 0 5px 8px;
+  border-left-color: currentColor;
+}
+
+pendulum-bench .pb-toggle[data-playing="true"] i {
+  width: 3px;
+  height: 11px;
+  border: solid currentColor;
+  border-width: 0 2px;
+}
+
+@container (max-width: 350px) {
+  pendulum-bench .pb-heading,
+  pendulum-bench .pb-controls {
+    gap: .65rem;
+    padding-inline: .8rem;
+  }
+
+  pendulum-bench .pb-display {
+    padding-inline: .25rem .65rem;
+    grid-template-columns: 1fr 1fr;
+  }
+}

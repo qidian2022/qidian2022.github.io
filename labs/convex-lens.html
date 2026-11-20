@@ -1,0 +1,696 @@
+<!doctype html>
+<!--
+MIT License
+
+Copyright (c) 2026 Yiyan Bai
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="把物体从两倍焦距外移到焦点以内，看看它的像去了哪里。">
+<title>凸透镜成像 · 课堂演示</title>
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f7f6ef;
+  --ink: #173c3b;
+  --line: #cbd8ce;
+  --muted-ink: #516a64;
+  --radius-lg: 10px;
+  --viz-series-2: #c96b2e;
+  --viz-series-3: #1b826c;
+  --viz-series-5: #745fc7;
+  --muted-foreground: #748987;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font: 16px/1.55 system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+main { width: min(1080px, 100%); margin: 0 auto; padding: 28px clamp(16px, 4vw, 46px) 48px; }
+.lab-nav a { display: inline-block; padding: 5px 0; color: #386761; font-size: 14px; text-decoration: none; }
+.lab-nav a:hover { text-decoration: underline; }
+header { margin: 32px 0 24px; }
+header small { display: block; color: #52736b; font: 600 12px/1.4 ui-monospace, Menlo, monospace; letter-spacing: .12em; }
+h1 { margin: 6px 0 8px; font: 650 clamp(28px, 4vw, 44px)/1.28 "Songti SC", "Noto Serif CJK SC", serif; }
+header p { color: var(--muted-ink); margin: 0; }
+button, input, select { font: inherit; }
+button, select, input[type=range], input[type=checkbox] { cursor: pointer; }
+button { color: var(--ink); }
+:focus-visible { outline: 3px solid #bb602e; outline-offset: 3px; }
+.btn, .form-select {
+  padding: 8px 13px; min-height: 42px; border: 1px solid var(--line); border-radius: 6px;
+  background: #fffef9; color: var(--ink); line-height: 1.4;
+}
+.btn:hover { border-color: var(--ink); }
+.btn-primary { background: var(--ink); border-color: var(--ink); color: white; }
+.viz-badge {
+  padding: 4px 10px; border-radius: 4px; color: #395d54; background: #e1ebe0;
+  font-size: 12px; font-weight: 650;
+}
+.viz-grid { display: grid; gap: 8px; }
+.card { border: 1px solid var(--line); background: #fffef9; border-radius: 10px; }
+.viz-stat { padding: 10px 14px; }
+.viz-stat-value { line-height: 1.5; font-weight: 600; }
+.text-muted { font-size: 13px; color: var(--muted-ink); }
+.viz-controls, .viz-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.viz-controls { background: #fffef9; border: 1px solid var(--line); padding: 12px; border-radius: 8px; }
+.form-check { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; cursor: pointer; }
+.form-check-input { width: 18px; height: 18px; accent-color: #225b51; }
+.form-range { accent-color: #225b51; margin: 0; min-height: 24px; }
+.form-label, .form-check-label { font-size: 14px; }
+.cll-stage-footer, .asl-stage-footer, .cll-legend { color: var(--muted-ink); font-size: 13px; }
+.cll-footnote, .asl-footnote { font-size: 15px; margin: 6px 0; }
+canvas {
+  --background: #10282e; --foreground: #eff7f0; --muted-foreground: #b3c7c1;
+  --border: #73938d; --popover: #203a40; --popover-foreground: #f7faf3;
+  --secondary-foreground: #d5e2dc; --viz-series-1: #6bb9f0;
+  --viz-series-2: #ffc177; --viz-series-3: #7de5bd; --viz-series-4: #e58896;
+  --viz-series-5: #c3a5ef; --viz-series-6: #78d1d7;
+  height: auto;
+}
+@media(max-width: 560px) {
+  main { padding: 16px 12px 28px; }
+  header { margin: 20px 0; }
+  .viz-stat { padding: 6px 10px; display:flex; gap: 10px; align-items: center; }
+  .viz-stat .text-muted { min-width: 4em; }
+  .viz-stat .viz-stat-value { margin: 0 !important; }
+  .viz-grid { gap: 3px; }
+  .btn { padding: 6px 10px; font-size: 14px; }
+  .viz-controls { gap: 7px 12px; }
+}
+</style>
+</head>
+<body><main>
+<nav class="lab-nav" aria-label="返回主页"><a href="../index.html#labs"><span aria-hidden="true">←</span> 课堂演示</a></nav>
+<header><small>GEOMETRICAL OPTICS</small><h1>凸透镜成像</h1><p>把物体从两倍焦距外移到焦点以内，看看它的像去了哪里。</p></header>
+<div id="convex-lens-lab">
+  <div class="cll-zonebar" role="group" aria-label="物距区域快速定位">
+    <button type="button" class="btn btn-primary cll-zone" data-ratio="2.65" aria-pressed="true">二倍焦距外</button>
+    <button type="button" class="btn cll-zone" data-ratio="2" aria-pressed="false">二倍焦距处</button>
+    <button type="button" class="btn cll-zone" data-ratio="1.5" aria-pressed="false">一倍与二倍之间</button>
+    <button type="button" class="btn cll-zone" data-ratio="1" aria-pressed="false">焦点处</button>
+    <button type="button" class="btn cll-zone" data-ratio="0.65" aria-pressed="false">焦点以内</button>
+    <span class="viz-badge cll-badge" aria-live="polite">倒立 · 缩小 · 实像</span>
+  </div>
+
+  <div class="viz-grid cll-stats" aria-live="polite">
+    <div class="card viz-stat">
+      <span class="text-muted">物距区域</span>
+      <span class="viz-stat-value" id="cll-region">二倍焦距以外</span>
+    </div>
+    <div class="card viz-stat">
+      <span class="text-muted">像的位置</span>
+      <span class="viz-stat-value" id="cll-position">像方 f 与 2f 之间</span>
+    </div>
+    <div class="card viz-stat">
+      <span class="text-muted">成像特点</span>
+      <span class="viz-stat-value" id="cll-result">倒立 · 缩小 · 实像</span>
+    </div>
+  </div>
+
+  <div class="card cll-stage">
+    <canvas id="cll-canvas" role="img" aria-label="可拖动物体和凸透镜的凸透镜成像与特殊光线演示"></canvas>
+    <div class="cll-stage-footer">
+      <span><span aria-hidden="true">↕</span> 拖动物体可上下、前后移动</span>
+      <span><span aria-hidden="true">↔</span> 拖动透镜可左右移动</span>
+      <span class="text-muted" id="cll-live-distance">物距约 2.65f</span>
+    </div>
+  </div>
+
+  <div class="viz-controls" aria-label="演示控制">
+    <button type="button" class="btn btn-primary" id="cll-reset"><span aria-hidden="true">↺</span><span>复位</span></button>
+    <label class="form-check form-switch">
+      <input class="form-check-input" id="cll-labels" type="checkbox" checked>
+      <span class="form-check-label">显示完整标注</span>
+    </label>
+    <label class="form-check form-switch">
+      <input class="form-check-input" id="cll-third-ray" type="checkbox" checked>
+      <span class="form-check-label">显示第三条特殊光线</span>
+    </label>
+  </div>
+
+  <div class="viz-row cll-legend" aria-label="特殊光线图例">
+    <span><i class="cll-swatch cll-ray-parallel" aria-hidden="true"></i>平行主光轴 → 通过像方焦点</span>
+    <span><i class="cll-swatch cll-ray-center" aria-hidden="true"></i>通过光心 → 方向不变</span>
+    <span><i class="cll-swatch cll-ray-focus" aria-hidden="true"></i>通过物方焦点 → 平行主光轴</span>
+    <span><i class="cll-dash" aria-hidden="true"></i>反向延长线</span>
+  </div>
+
+  <p class="text-small text-muted cll-footnote" id="cll-footnote">物体位于二倍焦距以外时，像成在另一侧的一倍与二倍焦距之间。</p>
+</div>
+
+<style>
+  #convex-lens-lab {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  #convex-lens-lab .cll-zonebar,
+  #convex-lens-lab .cll-stage-footer,
+  #convex-lens-lab .cll-legend,
+  #convex-lens-lab .cll-legend span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #convex-lens-lab .cll-zonebar { flex-wrap: wrap; }
+  #convex-lens-lab .cll-badge { margin-inline-start: auto; }
+  #convex-lens-lab .cll-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #convex-lens-lab .cll-stats .viz-stat-value {
+    display: block;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+  }
+  #convex-lens-lab .cll-stage { padding: 8px; }
+  #convex-lens-lab #cll-canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    border-radius: var(--radius-lg);
+    background: var(--background);
+    touch-action: none;
+    cursor: grab;
+    color-scheme: dark;
+  }
+  #convex-lens-lab #cll-canvas:active { cursor: grabbing; }
+  #convex-lens-lab .cll-stage-footer {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 8px 4px 0;
+  }
+  #convex-lens-lab .cll-stage-footer span,
+  #convex-lens-lab .cll-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  #convex-lens-lab .cll-legend {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  #convex-lens-lab .cll-swatch {
+    display: inline-block;
+    width: 22px;
+    height: 3px;
+    border-radius: 999px;
+  }
+  #convex-lens-lab .cll-ray-parallel { background: var(--viz-series-2); }
+  #convex-lens-lab .cll-ray-center { background: var(--viz-series-3); }
+  #convex-lens-lab .cll-ray-focus { background: var(--viz-series-5); }
+  #convex-lens-lab .cll-dash {
+    display: inline-block;
+    width: 22px;
+    border-top: 2px dashed var(--muted-foreground);
+  }
+  #convex-lens-lab .cll-footnote { text-align: center; }
+  @media (max-width: 560px) {
+    #convex-lens-lab .cll-stats { grid-template-columns: 1fr; }
+    #convex-lens-lab .cll-badge { width: 100%; margin-inline-start: 0; }
+    #convex-lens-lab #cll-canvas { aspect-ratio: 4 / 3; }
+    #convex-lens-lab .cll-legend { justify-content: flex-start; }
+  }
+</style>
+
+<script>
+(() => {
+  const root = document.getElementById('convex-lens-lab');
+  if (!root) return;
+
+  const canvas = root.querySelector('#cll-canvas');
+  const ctx = canvas.getContext('2d');
+  const ui = {
+    zones: [...root.querySelectorAll('.cll-zone')],
+    badge: root.querySelector('.cll-badge'),
+    region: root.querySelector('#cll-region'),
+    position: root.querySelector('#cll-position'),
+    result: root.querySelector('#cll-result'),
+    footnote: root.querySelector('#cll-footnote'),
+    distance: root.querySelector('#cll-live-distance'),
+    reset: root.querySelector('#cll-reset'),
+    labels: root.querySelector('#cll-labels'),
+    thirdRay: root.querySelector('#cll-third-ray')
+  };
+
+  const state = {
+    lensX: 0.58,
+    objectX: 0.301,
+    objectBaseY: 0.56,
+    dragging: null,
+    pointerId: null,
+    view: { width: 0, height: 0, dpr: 1 }
+  };
+  const focusRatio = 0.105;
+  const colorCache = new Map();
+  const alphaCache = new Map();
+
+  function color(name) {
+    const key = `${name}:${document.documentElement.getAttribute('data-theme') || 'auto'}`;
+    if (colorCache.has(key)) return colorCache.get(key);
+    const probe = document.createElement('span');
+    probe.style.color = `var(${name})`;
+    probe.style.display = 'none';
+    canvas.appendChild(probe);
+    const value = getComputedStyle(probe).color;
+    probe.remove();
+    colorCache.set(key, value);
+    return value;
+  }
+
+  function rgba(value, alpha) {
+    const key = `${value}:${alpha}`;
+    if (alphaCache.has(key)) return alphaCache.get(key);
+    const nums = value.match(/[\d.]+/g);
+    const result = nums && nums.length >= 3 ? `rgba(${nums[0]}, ${nums[1]}, ${nums[2]}, ${alpha})` : value;
+    alphaCache.set(key, result);
+    return result;
+  }
+
+  function palette() {
+    return {
+      bg: color('--background'),
+      fg: color('--foreground'),
+      muted: color('--muted-foreground'),
+      border: color('--border'),
+      panel: color('--popover'),
+      panelFg: color('--popover-foreground'),
+      lens: color('--viz-series-1'),
+      object: color('--viz-series-2'),
+      image: color('--viz-series-3'),
+      rayParallel: color('--viz-series-2'),
+      rayCenter: color('--viz-series-3'),
+      rayFocus: color('--viz-series-5'),
+      accent: color('--viz-series-6')
+    };
+  }
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = Math.max(1, Math.round(rect.width));
+    const height = Math.max(1, Math.round(rect.height));
+    const pixelWidth = Math.round(width * dpr);
+    const pixelHeight = Math.round(height * dpr);
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    state.view = { width, height, dpr };
+    draw();
+  }
+
+  function scene() {
+    const { width: w, height: h } = state.view;
+    const axisY = h * 0.56;
+    const f = w * focusRatio;
+    const lensX = state.lensX * w;
+    const objectX = state.objectX * w;
+    const objectBaseY = state.objectBaseY * h;
+    const objectTipY = objectBaseY - h * 0.17;
+    const u = lensX - objectX;
+    const ratio = u / f;
+    const atFocus = Math.abs(ratio - 1) < 1e-8;
+    let v = Infinity;
+    let magnification = Infinity;
+    if (!atFocus) {
+      v = f * u / (u - f);
+      magnification = -v / u;
+    }
+    return {
+      w, h, axisY, f, lensX, objectX, objectBaseY, objectTipY, u, ratio,
+      atFocus, v, magnification,
+      imageX: atFocus ? Infinity : lensX + v,
+      imageBaseY: atFocus ? Infinity : axisY + magnification * (objectBaseY - axisY),
+      imageTipY: atFocus ? Infinity : axisY + magnification * (objectTipY - axisY)
+    };
+  }
+
+  function classification(s) {
+    const r = s.ratio;
+    if (s.atFocus) {
+      return {
+        key: 'focus', region: '物体位于焦点处', position: '像在无穷远处', result: '不成清晰像', badge: '折射光线平行',
+        foot: '物体位于焦点处时，折射光线彼此平行，光屏上得不到清晰的像。'
+      };
+    }
+    if (r > 2 + 1e-8) {
+      return {
+        key: 'far', region: '二倍焦距以外', position: '像方 f 与 2f 之间', result: '倒立 · 缩小 · 实像', badge: '倒立 · 缩小 · 实像',
+        foot: '物体位于二倍焦距以外时，像成在另一侧的一倍与二倍焦距之间。'
+      };
+    }
+    if (r >= 2 - 1e-8) {
+      return {
+        key: 'two', region: '二倍焦距处', position: '像方二倍焦距处', result: '倒立 · 等大 · 实像', badge: '倒立 · 等大 · 实像',
+        foot: '物体位于二倍焦距处时，像也位于另一侧二倍焦距处，物像等大。'
+      };
+    }
+    if (r > 1) {
+      return {
+        key: 'middle', region: '一倍与二倍焦距之间', position: '像方二倍焦距以外', result: '倒立 · 放大 · 实像', badge: '倒立 · 放大 · 实像',
+        foot: '物体位于一倍与二倍焦距之间时，像成在另一侧二倍焦距以外。'
+      };
+    }
+    return {
+      key: 'inside', region: '焦点以内', position: '物体同侧', result: '正立 · 放大 · 虚像', badge: '正立 · 放大 · 虚像',
+      foot: '物体位于焦点以内时，折射光线的反向延长线相交，形成正立、放大的虚像。'
+    };
+  }
+
+  function line(x1, y1, x2, y2, stroke, width = 1.5, dash = []) {
+    ctx.save();
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = width;
+    ctx.setLineDash(dash);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function arrowhead(x1, y1, x2, y2, fill) {
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    ctx.save();
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - 7 * Math.cos(angle - 0.42), y2 - 7 * Math.sin(angle - 0.42));
+    ctx.lineTo(x2 - 7 * Math.cos(angle + 0.42), y2 - 7 * Math.sin(angle + 0.42));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function raySegment(x1, y1, x2, y2, stroke, dash = []) {
+    line(x1, y1, x2, y2, stroke, 1.6, dash);
+    if (!dash.length) {
+      const t = 0.68;
+      const ax = x1 + (x2 - x1) * t;
+      const ay = y1 + (y2 - y1) * t;
+      arrowhead(x1, y1, ax, ay, stroke);
+    }
+  }
+
+  function roundedLabel(label, x, y, p, anchor = 'center') {
+    if (!ui.labels.checked) return;
+    ctx.save();
+    ctx.font = '500 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.textAlign = anchor;
+    ctx.textBaseline = 'middle';
+    const width = ctx.measureText(label).width;
+    const bx = anchor === 'center' ? x - width / 2 - 6 : anchor === 'left' ? x - 6 : x - width - 6;
+    ctx.fillStyle = rgba(p.panel, 0.88);
+    ctx.beginPath();
+    ctx.roundRect(bx, y - 11, width + 12, 22, 7);
+    ctx.fill();
+    ctx.fillStyle = p.panelFg;
+    ctx.fillText(label, x, y);
+    ctx.restore();
+  }
+
+  function drawArrowObject(x, baseY, tipY, colorValue, label, p, virtual = false) {
+    const direction = tipY < baseY ? -1 : 1;
+    const length = Math.abs(baseY - tipY);
+    ctx.save();
+    ctx.strokeStyle = colorValue;
+    ctx.fillStyle = colorValue;
+    ctx.lineWidth = Math.max(2, Math.min(5, length * 0.045));
+    if (virtual) ctx.setLineDash([6, 5]);
+    ctx.beginPath();
+    ctx.moveTo(x, baseY);
+    ctx.lineTo(x, tipY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x, tipY);
+    ctx.lineTo(x - 9, tipY - direction * 12);
+    ctx.lineTo(x + 9, tipY - direction * 12);
+    ctx.closePath();
+    if (virtual) {
+      ctx.globalAlpha = 0.58;
+      ctx.fill();
+    } else {
+      ctx.fill();
+    }
+    ctx.globalAlpha = virtual ? 0.58 : 1;
+    ctx.fillRect(x - 15, baseY - 2, 30, 4);
+    ctx.restore();
+    roundedLabel(label, x, direction < 0 ? tipY - 20 : tipY + 20, p);
+  }
+
+  function drawBackground(s, p) {
+    ctx.fillStyle = p.bg;
+    ctx.fillRect(0, 0, s.w, s.h);
+    const glow = ctx.createRadialGradient(s.lensX, s.axisY, 0, s.lensX, s.axisY, s.w * 0.38);
+    glow.addColorStop(0, rgba(p.lens, 0.08));
+    glow.addColorStop(1, rgba(p.bg, 0));
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, s.w, s.h);
+  }
+
+  function drawAxisAndMarks(s, p) {
+    line(18, s.axisY, s.w - 18, s.axisY, rgba(p.muted, 0.7), 1, [5, 6]);
+    const marks = [
+      { x: s.lensX - 2 * s.f, label: '2F', strong: false },
+      { x: s.lensX - s.f, label: 'F', strong: true },
+      { x: s.lensX, label: 'O', strong: true },
+      { x: s.lensX + s.f, label: 'F′', strong: true },
+      { x: s.lensX + 2 * s.f, label: '2F′', strong: false }
+    ];
+    marks.forEach(mark => {
+      if (mark.x < 12 || mark.x > s.w - 12) return;
+      line(mark.x, s.axisY - (mark.strong ? 8 : 6), mark.x, s.axisY + (mark.strong ? 8 : 6), mark.strong ? p.fg : p.muted, mark.strong ? 1.5 : 1);
+      if (ui.labels.checked) {
+        ctx.save();
+        ctx.fillStyle = mark.strong ? p.fg : p.muted;
+        ctx.font = '500 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(mark.label, mark.x, s.axisY + 25);
+        ctx.restore();
+      }
+    });
+
+    if (ui.labels.checked) {
+      ctx.save();
+      ctx.fillStyle = p.muted;
+      ctx.font = '400 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('主光轴', 24, s.axisY - 11);
+      const dimY = Math.min(s.h - 20, s.axisY + 48);
+      line(s.lensX, dimY, s.lensX + s.f, dimY, rgba(p.lens, 0.72), 1.2);
+      line(s.lensX, dimY - 5, s.lensX, dimY + 5, rgba(p.lens, 0.72), 1.2);
+      line(s.lensX + s.f, dimY - 5, s.lensX + s.f, dimY + 5, rgba(p.lens, 0.72), 1.2);
+      ctx.fillStyle = p.fg;
+      ctx.textAlign = 'center';
+      ctx.fillText('焦距 f', s.lensX + s.f / 2, dimY - 7);
+      ctx.restore();
+    }
+  }
+
+  function drawLens(s, p) {
+    const top = s.h * 0.17;
+    const bottom = s.h * 0.87;
+    const halfWidth = Math.max(10, s.w * 0.011);
+    const gradient = ctx.createLinearGradient(s.lensX - halfWidth, 0, s.lensX + halfWidth, 0);
+    gradient.addColorStop(0, rgba(p.lens, 0.22));
+    gradient.addColorStop(0.5, rgba(p.lens, 0.72));
+    gradient.addColorStop(1, rgba(p.lens, 0.22));
+    ctx.save();
+    ctx.fillStyle = gradient;
+    ctx.strokeStyle = rgba(p.lens, 0.9);
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = rgba(p.lens, 0.45);
+    ctx.shadowBlur = 18;
+    ctx.beginPath();
+    ctx.moveTo(s.lensX, top);
+    ctx.bezierCurveTo(s.lensX + halfWidth * 1.7, top + s.h * 0.13, s.lensX + halfWidth * 1.7, bottom - s.h * 0.13, s.lensX, bottom);
+    ctx.bezierCurveTo(s.lensX - halfWidth * 1.7, bottom - s.h * 0.13, s.lensX - halfWidth * 1.7, top + s.h * 0.13, s.lensX, top);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle = p.fg;
+    ctx.beginPath();
+    ctx.arc(s.lensX, s.axisY, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    roundedLabel('凸透镜', s.lensX, top - 18, p);
+    roundedLabel('光心 O', s.lensX + 10, s.axisY - 18, p, 'left');
+  }
+
+  function drawSpecialRays(s, p) {
+    const marginX = s.w + 24;
+    const tipX = s.objectX;
+    const tipY = s.objectTipY;
+    const outgoing = [];
+
+    const hitParallel = { x: s.lensX, y: tipY };
+    const slopeParallel = (s.axisY - tipY) / s.f;
+    const endParallel = { x: marginX, y: tipY + slopeParallel * (marginX - s.lensX) };
+    raySegment(tipX, tipY, hitParallel.x, hitParallel.y, p.rayParallel);
+    raySegment(hitParallel.x, hitParallel.y, endParallel.x, endParallel.y, p.rayParallel);
+    outgoing.push(hitParallel);
+
+    const hitCenter = { x: s.lensX, y: s.axisY };
+    const slopeCenter = (s.axisY - tipY) / Math.max(1, s.lensX - tipX);
+    const endCenter = { x: marginX, y: s.axisY + slopeCenter * (marginX - s.lensX) };
+    raySegment(tipX, tipY, hitCenter.x, hitCenter.y, p.rayCenter);
+    raySegment(hitCenter.x, hitCenter.y, endCenter.x, endCenter.y, p.rayCenter);
+    outgoing.push(hitCenter);
+
+    if (ui.thirdRay.checked && Math.abs(s.ratio - 1) > 0.035) {
+      const focusX = s.lensX - s.f;
+      const slopeFocus = (s.axisY - tipY) / (focusX - tipX);
+      const hitFocus = { x: s.lensX, y: tipY + slopeFocus * (s.lensX - tipX) };
+      if (s.ratio < 1 && ui.labels.checked) {
+        raySegment(focusX, s.axisY, tipX, tipY, rgba(p.rayFocus, 0.55), [5, 5]);
+      }
+      raySegment(tipX, tipY, hitFocus.x, hitFocus.y, p.rayFocus);
+      raySegment(hitFocus.x, hitFocus.y, marginX, hitFocus.y, p.rayFocus);
+      outgoing.push(hitFocus);
+    }
+
+    if (s.ratio < 1 && !s.atFocus && Number.isFinite(s.imageX)) {
+      outgoing.slice(0, 2).forEach(hit => {
+        raySegment(hit.x, hit.y, s.imageX, s.imageTipY, rgba(p.muted, 0.7), [6, 5]);
+      });
+    }
+  }
+
+  function drawImage(s, p, info) {
+    const withinX = Number.isFinite(s.imageX) && s.imageX > 16 && s.imageX < s.w - 16;
+    const withinY = Number.isFinite(s.imageTipY) && s.imageTipY > -s.h * 0.5 && s.imageTipY < s.h * 1.5;
+    if (s.atFocus) {
+      roundedLabel('像在无穷远处', s.w - 22, s.axisY - 48, p, 'right');
+      return;
+    }
+    if (withinX && withinY) {
+      drawArrowObject(s.imageX, s.imageBaseY, s.imageTipY, p.image, info.key === 'inside' ? '虚像' : '实像', p, info.key === 'inside');
+      return;
+    }
+    if (ui.labels.checked) {
+      const side = !withinX ? (s.imageX < 16 ? '画面左边' : '画面右边') : (s.imageTipY < 0 ? '画面上方' : '画面下方');
+      roundedLabel(`像在${side}`, s.imageX < 0 ? 18 : s.w - 18, s.axisY - 46, p, s.imageX < 0 ? 'left' : 'right');
+    }
+  }
+
+  function updateText(s, info) {
+    ui.region.textContent = info.region;
+    ui.position.textContent = info.position;
+    ui.result.textContent = info.result;
+    ui.badge.textContent = info.badge;
+    ui.footnote.textContent = info.foot;
+    ui.distance.textContent = `物距约 ${s.ratio.toFixed(2)}f`;
+
+    const selectedKey = info.key;
+    const map = { far: '2.65', two: '2', middle: '1.5', focus: '1', inside: '0.65' };
+    ui.zones.forEach(button => {
+      const selected = button.dataset.ratio === map[selectedKey];
+      button.classList.toggle('btn-primary', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+  }
+
+  function draw() {
+    if (!state.view.width) return;
+    const s = scene();
+    const p = palette();
+    const info = classification(s);
+    drawBackground(s, p);
+    drawAxisAndMarks(s, p);
+    drawSpecialRays(s, p);
+    drawLens(s, p);
+    drawArrowObject(s.objectX, s.objectBaseY, s.objectTipY, p.object, '物体', p);
+    drawImage(s, p, info);
+    updateText(s, info);
+  }
+
+  function reset() {
+    state.lensX = 0.58;
+    state.objectX = 0.301;
+    state.objectBaseY = 0.56;
+    ui.labels.checked = true;
+    ui.thirdRay.checked = true;
+    draw();
+  }
+
+  ui.zones.forEach(button => {
+    button.addEventListener('click', () => {
+      const ratio = Number(button.dataset.ratio);
+      state.lensX = Math.max(state.lensX, 0.06 + ratio * focusRatio);
+      state.objectX = state.lensX - ratio * focusRatio;
+      draw();
+    });
+  });
+  ui.reset.addEventListener('click', reset);
+  ui.labels.addEventListener('change', draw);
+  ui.thirdRay.addEventListener('change', draw);
+
+  function pointerPosition(event) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (event.clientX - rect.left) / rect.width,
+      y: (event.clientY - rect.top) / rect.height
+    };
+  }
+
+  canvas.addEventListener('pointerdown', event => {
+    const point = pointerPosition(event);
+    const s = scene();
+    const px = point.x * s.w;
+    const py = point.y * s.h;
+    const objectNear = Math.abs(px - s.objectX) < 28 && py > Math.min(s.objectTipY, s.objectBaseY) - 24 && py < Math.max(s.objectTipY, s.objectBaseY) + 24;
+    const lensNear = Math.abs(px - s.lensX) < 28 && py > s.h * 0.12 && py < s.h * 0.92;
+    state.dragging = objectNear ? 'object' : lensNear ? 'lens' : null;
+    if (!state.dragging) return;
+    state.pointerId = event.pointerId;
+    canvas.setPointerCapture(event.pointerId);
+  });
+
+  canvas.addEventListener('pointermove', event => {
+    if (!state.dragging || event.pointerId !== state.pointerId) return;
+    const point = pointerPosition(event);
+    if (state.dragging === 'object') {
+      state.objectX = Math.max(0.055, Math.min(state.lensX - 0.045, point.x));
+      state.objectBaseY = Math.max(0.28, Math.min(0.82, point.y));
+    } else {
+      state.lensX = Math.max(state.objectX + 0.05, Math.min(0.78, point.x));
+    }
+    draw();
+  });
+
+  function endDrag(event) {
+    if (state.pointerId !== event.pointerId) return;
+    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    state.dragging = null;
+    state.pointerId = null;
+  }
+  canvas.addEventListener('pointerup', endDrag);
+  canvas.addEventListener('pointercancel', endDrag);
+
+  const observer = new ResizeObserver(resize);
+  observer.observe(canvas);
+  window.addEventListener('resize', resize);
+  requestAnimationFrame(resize);
+})();
+</script>
+</main></body></html>
